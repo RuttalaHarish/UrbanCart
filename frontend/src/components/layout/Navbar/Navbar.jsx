@@ -1,0 +1,277 @@
+import { useState, useRef, useEffect } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import {
+  FiSearch,
+  FiHeart,
+  FiShoppingCart,
+  FiUser,
+  FiMenu,
+  FiX,
+  FiLogOut,
+  FiLogIn,
+  FiPackage,
+} from 'react-icons/fi';
+import { useAuth } from '../../../context/AuthContext';
+import { useCart } from '../../../context/CartContext';
+import './Navbar.css';
+
+const NAV_LINKS = [
+  { to: '/', label: 'Home' },
+  { to: '/shop', label: 'Shop' },
+  { to: '/categories', label: 'Categories' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+];
+
+function Navbar() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
+  const navigate = useNavigate();
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const profileRef = useRef(null);
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
+  const handleLogout = () => {
+    logout();
+    setProfileOpen(false);
+    setMobileOpen(false);
+    navigate('/');
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      const q = searchQuery.trim();
+      if (q) {
+        navigate(`/shop?q=${encodeURIComponent(q)}`);
+      } else {
+        navigate('/shop');
+      }
+      setMobileOpen(false);
+    }
+  };
+
+  return (
+    <header className="navbar-header">
+      <div className="container navbar-container">
+        {/* Brand Logo */}
+        <Link to="/" className="navbar-logo">
+          Urban<span>Cart</span>
+        </Link>
+
+        {/* Desktop Navigation Links */}
+        <nav className="navbar-nav">
+          <ul className="navbar-links">
+            {NAV_LINKS.map((link) => (
+              <li key={link.to} className="navbar-link-item">
+                <NavLink
+                  to={link.to}
+                  end={link.to === '/'}
+                >
+                  {link.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Desktop Search */}
+        <div className="navbar-search">
+          <span className="navbar-search__icon">
+            <FiSearch size={14} />
+          </span>
+          <input
+            type="text"
+            className="navbar-search__input"
+            placeholder="Search products..."
+            aria-label="Search products"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
+          />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="navbar-actions">
+          {/* Wishlist */}
+          <Link to="/wishlist" className="navbar-wishlist-btn" aria-label="Wishlist">
+            <FiHeart size={20} />
+          </Link>
+
+          {/* Cart */}
+          <Link to="/cart" className="navbar-cart-btn" aria-label="Shopping Cart">
+            <FiShoppingCart size={20} />
+            <span className="navbar-cart-count">{cartCount}</span>
+          </Link>
+
+          {/* Auth / Profile */}
+          {isAuthenticated ? (
+            <div className="navbar-profile" ref={profileRef}>
+              <button
+                className="navbar-profile-btn"
+                onClick={() => setProfileOpen((prev) => !prev)}
+                aria-label="Account menu"
+              >
+                <FiUser size={16} />
+                {user?.name?.split(' ')[0] || 'Account'}
+              </button>
+
+              {profileOpen && (
+                <div className="navbar-profile-dropdown">
+                  <Link
+                    to="/my-orders"
+                    className="navbar-profile-dropdown__item"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <FiPackage size={14} />
+                    My Orders
+                  </Link>
+                  <hr className="navbar-profile-dropdown__divider" />
+                  <button
+                    className="navbar-profile-dropdown__item navbar-profile-dropdown__item--danger"
+                    onClick={handleLogout}
+                  >
+                    <FiLogOut size={14} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="navbar-login-btn">
+              Login
+            </Link>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="mobile-nav-toggle"
+            aria-label="Toggle Menu"
+            onClick={() => setMobileOpen(true)}
+          >
+            <FiMenu size={24} />
+          </button>
+        </div>
+      </div>
+
+      {/* ===== Mobile Menu ===== */}
+      <div
+        className={`mobile-nav-overlay ${mobileOpen ? 'mobile-nav-overlay--open' : ''}`}
+        onClick={() => setMobileOpen(false)}
+      />
+      <div className={`mobile-nav-menu ${mobileOpen ? 'mobile-nav-menu--open' : ''}`}>
+        <button
+          className="mobile-nav-menu__close"
+          onClick={() => setMobileOpen(false)}
+          aria-label="Close menu"
+        >
+          <FiX size={22} />
+        </button>
+
+        {/* Mobile Search */}
+        <div className="mobile-nav-menu__search">
+          <span className="navbar-search__icon">
+            <FiSearch size={14} />
+          </span>
+          <input
+            type="text"
+            className="navbar-search__input"
+            placeholder="Search products..."
+            aria-label="Search products"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
+          />
+        </div>
+
+        {/* Mobile Nav Links */}
+        <ul className="mobile-nav-menu__links">
+          {NAV_LINKS.map((link) => (
+            <li key={link.to} className="mobile-nav-menu__link">
+              <NavLink
+                to={link.to}
+                end={link.to === '/'}
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+
+        <hr className="mobile-nav-menu__divider" />
+
+        {/* Mobile Actions */}
+        <div className="mobile-nav-menu__actions">
+          <Link
+            to="/wishlist"
+            className="mobile-nav-menu__action-btn"
+            onClick={() => setMobileOpen(false)}
+          >
+            <FiHeart size={18} />
+            Wishlist
+          </Link>
+          <Link
+            to="/cart"
+            className="mobile-nav-menu__action-btn"
+            onClick={() => setMobileOpen(false)}
+          >
+            <FiShoppingCart size={18} />
+            Cart
+          </Link>
+
+          <hr className="mobile-nav-menu__divider" />
+
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/my-orders"
+                className="mobile-nav-menu__action-btn"
+                onClick={() => setMobileOpen(false)}
+              >
+                <FiPackage size={18} />
+                My Orders
+              </Link>
+              <button
+                className="mobile-nav-menu__action-btn mobile-nav-menu__action-btn--danger"
+                onClick={handleLogout}
+              >
+                <FiLogOut size={18} />
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="mobile-nav-menu__action-btn"
+              onClick={() => setMobileOpen(false)}
+            >
+              <FiLogIn size={18} />
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default Navbar;

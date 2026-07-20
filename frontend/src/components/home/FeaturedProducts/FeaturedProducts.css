@@ -1,0 +1,149 @@
+/*
+ * UrbanCart — Featured Products Container Styles
+ * Handles responsive grid columns, animations, loaders, error messages, and spacing.
+ */
+
+.featured-products {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xxl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===== Section Header ===== */
+.featured-products-header {
+  text-align: left;
+  margin-bottom: var(--spacing-md);
+}
+
+.featured-products-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--color-primary);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.featured-products-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xxs) 0;
+}
+
+.featured-products-subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ===== Responsive Products Grid ===== */
+.featured-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 cards per row (Desktop) */
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+/* ===== Loading State ===== */
+.featured-products-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  gap: var(--spacing-md);
+  color: var(--color-text-secondary);
+}
+
+.featured-products-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: prodSpinnerRotate 0.8s linear infinite;
+}
+
+@keyframes prodSpinnerRotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Info Message Boxes (Error, Empty) ===== */
+.featured-products-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xxl) var(--spacing-xl);
+  min-height: 250px;
+  box-sizing: border-box;
+}
+
+.featured-products-message-icon {
+  font-size: 2.25rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.featured-products-message-title {
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xxs) 0;
+}
+
+.featured-products-message-text {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  max-width: 340px;
+  margin: 0;
+}
+
+.featured-products-retry-btn {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-lg);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.featured-products-retry-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===== Responsive breakpoints ===== */
+@media (max-width: 1024px) {
+  .featured-products-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards per row (Tablet) */
+  }
+}
+
+@media (max-width: 640px) {
+  .featured-products-grid {
+    grid-template-columns: 1fr; /* 1 card per row (Mobile) */
+  }
+
+  .featured-products-header {
+    text-align: center;
+  }
+}

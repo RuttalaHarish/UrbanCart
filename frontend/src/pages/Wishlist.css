@@ -1,0 +1,59 @@
+/*
+ * UrbanCart — Wishlist Page Layout Styles
+ */
+
+.wishlist-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wishlist-title-block {
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+}
+
+.wishlist-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ===== List Card Outline Wrapper ===== */
+.wishlist-items-list {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 0 var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== Skeletons Loader ===== */
+.wishlist-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.wishlist-skeleton-item {
+  height: 100px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-xl);
+  animation: wishlistPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes wishlistPulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}

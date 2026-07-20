@@ -1,0 +1,49 @@
+/*
+ * UrbanCart — Quantity Selector Styling
+ */
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  background-color: var(--color-bg);
+  width: fit-content;
+}
+
+.quantity-selector-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.quantity-selector-btn:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.quantity-selector-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quantity-selector-value {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  width: 40px;
+  text-align: center;
+  user-select: none;
+}

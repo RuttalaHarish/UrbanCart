@@ -1,0 +1,298 @@
+/*
+ * UrbanCart — My Orders Page Layout Styles
+ */
+
+.orders-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.orders-title-block {
+  text-align: left;
+  margin-bottom: var(--spacing-lg);
+}
+
+.orders-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ===== Order Card Card Styling ===== */
+.order-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Header inside Order Card */
+.order-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-md);
+}
+
+.order-meta-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+}
+
+.order-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.order-meta-label {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-semibold);
+}
+
+.order-meta-value {
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Status badge wrappers */
+.order-status-wrapper {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+}
+
+/* Order Status Badge Variations */
+.badge-order-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.badge-order-processing {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-order-shipped {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.badge-order-delivered {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-order-cancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Payment Status Badge Variations */
+.badge-payment-pending {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.badge-payment-paid {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-payment-failed {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* ===== Order Items List ===== */
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.order-item-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) 0;
+}
+
+.order-item-row:not(:last-child) {
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.order-item-img-container {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  flex-shrink: 0;
+}
+
+.order-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.order-item-placeholder {
+  color: var(--color-text-secondary);
+}
+
+.order-item-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.order-item-name {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.order-item-brand {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+.order-item-price-qty {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.order-item-qty {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+.order-item-subtotal {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ===== Skeletons Loader ===== */
+.orders-skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.orders-skeleton-card {
+  height: 180px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  animation: ordersPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes ordersPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.6; }
+}
+
+/* ===== Empty Orders State ===== */
+.empty-orders-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-xxxl) var(--spacing-xl);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.empty-orders-illustration {
+  width: 80px;
+  height: 80px;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+  margin-bottom: var(--spacing-lg);
+}
+
+.empty-orders-title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-top: 0;
+  margin-bottom: var(--spacing-xs);
+}
+
+.empty-orders-text {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+  max-width: 400px;
+  line-height: var(--line-height-normal);
+}
+
+.empty-orders-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #fff;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.empty-orders-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  color: #fff;
+}

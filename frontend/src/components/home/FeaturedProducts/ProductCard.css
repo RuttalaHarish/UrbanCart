@@ -1,0 +1,207 @@
+/*
+ * UrbanCart — Product Card Styles
+ * Premium rounded card layout with soft shadows and hover elevations.
+ */
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast),
+              box-shadow var(--transition-fast),
+              border-color var(--transition-fast);
+  box-sizing: border-box;
+  animation: productCardFadeIn var(--transition-slow) ease-out;
+}
+
+@keyframes productCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg), 0 10px 30px rgba(37, 99, 235, 0.08);
+}
+
+/* ===== Image / Graphic Media ===== */
+.product-card-media {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* Forces 1:1 Aspect Ratio */
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
+.product-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.product-card:hover .product-card-img {
+  transform: scale(1.06);
+}
+
+/* Beautiful dynamic placeholder for missing images */
+.product-card-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(79, 70, 229, 0.04));
+  font-size: var(--font-size-small);
+}
+
+.product-card-placeholder-svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.6;
+}
+
+/* ===== Stock Badge Indicator ===== */
+.product-card-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-semibold);
+  padding: 4px var(--spacing-sm);
+  border-radius: var(--radius-full);
+  z-index: 10;
+  letter-spacing: 0.025em;
+  box-shadow: var(--shadow-sm);
+}
+
+.product-card-badge-instock {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.product-card-badge-outofstock {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ===== Product Card Info ===== */
+.product-card-body {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+  flex-grow: 1;
+  gap: var(--spacing-xxs);
+  text-align: left;
+}
+
+.product-card-category-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xxs);
+}
+
+.product-card-category {
+  text-transform: capitalize;
+}
+
+.product-card-brand {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.product-card-name {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.75rem; /* Forces fixed bounding box constraints */
+  line-height: var(--line-height-tight);
+}
+
+.product-card-price {
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: var(--spacing-xs) 0;
+}
+
+/* ===== Product Card Actions ===== */
+.product-card-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-top: auto;
+}
+
+.product-card-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+
+.product-card-btn-primary {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border: none;
+}
+
+.product-card-btn-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.product-card-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.product-card-btn-secondary {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.product-card-btn-secondary:hover {
+  background-color: var(--color-bg);
+  border-color: var(--color-text-secondary);
+  transform: translateY(-1px);
+}

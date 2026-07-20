@@ -1,8 +1,8 @@
 import { Outlet } from 'react-router-dom';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '../components/layout/Navbar/Navbar';
+import Footer from '../components/layout/Footer/Footer';
 
-function Layout() {
+function MainLayout() {
   return (
     <div className="app-container">
       <Navbar />
@@ -14,4 +14,4 @@ function Layout() {
   );
 }
 
-export default Layout;
+export default MainLayout;

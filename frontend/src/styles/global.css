@@ -5,7 +5,7 @@
 html {
   font-family: var(--font-sans);
   line-height: var(--line-height-normal);
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--color-text-primary);
   background-color: var(--color-bg);
 }

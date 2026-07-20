@@ -1,0 +1,87 @@
+/*
+ * UrbanCart — Product Gallery Styling
+ */
+
+.product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.product-gallery-main {
+  position: relative;
+  width: 100%;
+  padding-bottom: 80%; /* 5:4 aspect ratio */
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-gallery-main-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--spacing-md);
+  box-sizing: border-box;
+}
+
+.product-gallery-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(79, 70, 229, 0.04));
+}
+
+.product-gallery-placeholder-svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.5;
+  color: var(--color-text-secondary);
+}
+
+.product-gallery-thumbnails {
+  display: flex;
+  gap: var(--spacing-xs);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-xxs);
+}
+
+.product-gallery-thumbnail {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  overflow: hidden;
+  padding: 4px;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.product-gallery-thumbnail:hover {
+  transform: translateY(-2px);
+}
+
+.product-gallery-thumbnail-active {
+  border-color: var(--color-primary);
+}
+
+.product-gallery-thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

@@ -1,11 +1,16 @@
 import { Page, Section, Container } from '../components/common';
+import Hero from '../components/home/Hero/Hero';
+import Categories from '../components/home/Categories/Categories';
+import FeaturedProducts from '../components/home/FeaturedProducts/FeaturedProducts';
 
 function Home() {
   return (
     <Page title="Home">
       <Section bgType="default">
         <Container>
-          {/* Blank Main Area - Ready for future sections */}
+          <Hero />
+          <Categories />
+          <FeaturedProducts />
         </Container>
       </Section>
     </Page>

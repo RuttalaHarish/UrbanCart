@@ -1,0 +1,146 @@
+/*
+ * UrbanCart — Shop Page Layout Styles
+ */
+
+.shop-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.shop-header {
+  text-align: left;
+  margin-bottom: var(--spacing-xl);
+}
+
+.shop-title-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--color-primary);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.shop-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xxs) 0;
+}
+
+.shop-subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ===== Responsive Shop Grid ===== */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns on desktop */
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+/* ===== Loading Skeleton ===== */
+.shop-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.shop-skeleton-card {
+  height: 380px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-xl);
+  animation: shopPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes shopPulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* ===== Message Boxes (Error, Empty) ===== */
+.shop-message-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xxl) var(--spacing-xl);
+  min-height: 300px;
+  box-sizing: border-box;
+}
+
+.shop-message-icon {
+  font-size: 3rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.shop-message-title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.shop-message-text {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  max-width: 400px;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.shop-retry-btn {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.shop-retry-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===== Responsive Breakpoints ===== */
+@media (max-width: 1024px) {
+  .shop-grid,
+  .shop-skeleton-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
+  }
+}
+
+@media (max-width: 640px) {
+  .shop-grid,
+  .shop-skeleton-grid {
+    grid-template-columns: 1fr; /* 1 column on mobile */
+  }
+
+  .shop-header {
+    text-align: center;
+  }
+}

@@ -1,0 +1,71 @@
+/*
+ * UrbanCart — Empty Wishlist View Styles
+ */
+
+.empty-wishlist-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-xxl) var(--spacing-xl);
+  min-height: 400px;
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  box-sizing: border-box;
+}
+
+.empty-wishlist-illustration {
+  width: 140px;
+  height: 140px;
+  color: var(--color-text-secondary);
+  opacity: 0.4;
+  margin-bottom: var(--spacing-md);
+  animation: emptyWishlistFloat 4s ease-in-out infinite;
+}
+
+@keyframes emptyWishlistFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.empty-wishlist-title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xxs) 0;
+}
+
+.empty-wishlist-text {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  max-width: 320px;
+  margin: 0 0 var(--spacing-lg) 0;
+  line-height: var(--line-height-normal);
+}
+
+.empty-wishlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-xl);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.empty-wishlist-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}

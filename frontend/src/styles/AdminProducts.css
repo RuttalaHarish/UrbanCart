@@ -1,0 +1,252 @@
+/*
+ * UrbanCart — Admin Products Management Page Styles
+ */
+
+.admin-products-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.admin-products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.admin-products-title-group {
+  text-align: left;
+}
+
+.admin-products-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.admin-products-subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xxs);
+}
+
+/* Add Product Action button */
+.admin-add-product-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #ffffff;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-small);
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-add-product-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Table container scroll layout */
+.admin-table-container {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-products-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 900px;
+}
+
+/* Table headings */
+.admin-products-table th {
+  background-color: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1.5px solid var(--color-border);
+}
+
+/* Table rows */
+.admin-products-table td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  vertical-align: middle;
+}
+
+.admin-products-table tr:hover td {
+  background-color: #fafbfc;
+}
+
+/* Image column block */
+.admin-product-img-container {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+}
+
+/* Stock count styles */
+.admin-product-stock-low {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-product-stock-out {
+  color: var(--color-error);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Badges styling */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+}
+
+.badge-stock-in {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-stock-low {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
+.badge-stock-out {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Action button rows */
+.admin-table-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.admin-table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.admin-table-action-btn--edit {
+  color: var(--color-primary);
+}
+
+.admin-table-action-btn--edit:hover {
+  background-color: #eff6ff;
+  border-color: var(--color-primary);
+}
+
+.admin-table-action-btn--delete {
+  color: var(--color-error);
+}
+
+.admin-table-action-btn--delete:hover {
+  background-color: #fef2f2;
+  border-color: var(--color-error);
+}
+
+/* Toolbar & Filtering styling */
+.admin-toolbar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.admin-search-input {
+  flex: 1;
+  max-width: 450px;
+  min-width: 250px;
+  padding: 10px 16px;
+  font-size: var(--font-size-body);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.admin-filter-select {
+  padding: 10px 16px;
+  font-size: var(--font-size-body);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  min-width: 200px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-filter-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+@media (max-width: 640px) {
+  .admin-toolbar-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  
+  .admin-search-input,
+  .admin-filter-select {
+    max-width: 100%;
+    width: 100%;
+  }
+}

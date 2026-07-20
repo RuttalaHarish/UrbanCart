@@ -1,0 +1,223 @@
+/*
+ * UrbanCart — Admin Order Details Page Styles
+ */
+
+.admin-order-details-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.admin-order-details-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: left;
+}
+
+.admin-order-details-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Back Link Action Button */
+.admin-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--spacing-lg);
+}
+
+.admin-back-btn:hover {
+  background-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* ===== Details Grid Layout ===== */
+.admin-order-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .admin-order-details-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Cards layout for sections */
+.admin-details-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.admin-details-card-title {
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--spacing-xs);
+}
+
+/* Item row layouts */
+.admin-details-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.admin-details-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) 0;
+}
+
+.admin-details-item-row:not(:last-child) {
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.admin-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.admin-item-name {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.admin-item-qty {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+.admin-item-price {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* Financial Total Breakdown */
+.admin-details-financials {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-subheading);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+/* Info Summary Section list */
+.admin-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.admin-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.admin-info-label {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-info-value {
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-normal);
+}
+
+/* Status badge wrappers */
+.admin-status-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+}
+
+/* Order Status Badges */
+.badge-order-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.badge-order-processing {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-order-shipped {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.badge-order-delivered {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-order-cancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Payment Status Badges */
+.badge-payment-pending {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.badge-payment-paid {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-payment-failed {
+  background-color: #fee2e2;
+  color: #dc2626;
+}

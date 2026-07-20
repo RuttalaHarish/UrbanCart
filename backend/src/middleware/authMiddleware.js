@@ -48,6 +48,21 @@ const protect = async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware to restrict access to admin users only
+ */
+const admin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    return res.status(403).json({
+      success: false,
+      message: 'Not authorized, admin privileges required',
+    });
+  }
+};
+
 module.exports = {
   protect,
+  admin,
 };

@@ -1,0 +1,228 @@
+/*
+ * UrbanCart — Admin Add Product Page Styles
+ */
+
+.admin-add-product-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.admin-add-product-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: left;
+}
+
+.admin-add-product-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.admin-add-product-subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xxs);
+}
+
+/* Responsive Cards Layout */
+.admin-add-product-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  box-sizing: border-box;
+}
+
+/* Form sections */
+.admin-form-section {
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-form-section:last-of-type {
+  border-bottom: none;
+}
+
+.admin-form-section-title {
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Form inputs layout */
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  margin-bottom: var(--spacing-md);
+  text-align: left;
+}
+
+.admin-form-label {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.admin-form-input,
+.admin-form-textarea,
+.admin-form-select {
+  padding: 10px 14px;
+  font-size: var(--font-size-body);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-form-input:focus,
+.admin-form-textarea:focus,
+.admin-form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.admin-form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Two column grids for inputs */
+.admin-form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 640px) {
+  .admin-form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* Image URLs input rows styling */
+.admin-image-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.admin-image-input-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.admin-image-input-row .admin-form-input {
+  flex: 1;
+}
+
+.admin-remove-image-btn {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  transition: background-color var(--transition-fast);
+  height: 42px;
+}
+
+.admin-remove-image-btn:hover {
+  background-color: #fca5a5;
+}
+
+.admin-add-image-btn {
+  background-color: #eff6ff;
+  color: var(--color-primary);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  margin-top: var(--spacing-xs);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  transition: all var(--transition-fast);
+  width: fit-content;
+}
+
+.admin-add-image-btn:hover {
+  background-color: #dbeafe;
+}
+
+/* Form Actions Button row */
+.admin-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+.admin-btn {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.admin-btn-secondary {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.admin-btn-secondary:hover {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.admin-btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Validation error styling */
+.admin-error-text {
+  color: var(--color-error);
+  font-size: var(--font-size-small);
+  margin-top: 4px;
+}
+
+.admin-form-input.is-invalid,
+.admin-form-textarea.is-invalid,
+.admin-form-select.is-invalid {
+  border-color: var(--color-error);
+}
+
+.admin-form-input.is-invalid:focus,
+.admin-form-textarea.is-invalid:focus,
+.admin-form-select.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}

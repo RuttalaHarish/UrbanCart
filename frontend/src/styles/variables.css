@@ -84,19 +84,3 @@
   --breakpoint-wide: 1280px;         /* Larger desktop monitors */
 }
 
-/* --- 8. Colors (Dark Mode Specific overrides) --- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-primary: #3b82f6;          /* Brand primary (Light Blue) */
-    --color-secondary: #6366f1;        /* Brand secondary (Light Indigo) */
-    --color-accent: #e879f9;           /* Accent elements */
-    --color-success: #34d399;          /* Success states */
-    --color-warning: #fbbf24;          /* Warning states */
-    --color-error: #f87171;            /* Error states */
-    --color-bg: #0f172a;               /* App background (Slate 900) */
-    --color-surface: #1e293b;          /* Container backgrounds (Slate 800) */
-    --color-border: #334155;           /* Border/Divider lines (Slate 700) */
-    --color-text-primary: #f8fafc;      /* Primary readability text (Slate 50) */
-    --color-text-secondary: #94a3b8;    /* Secondary body/muted text (Slate 400) */
-  }
-}

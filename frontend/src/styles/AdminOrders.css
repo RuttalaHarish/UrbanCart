@@ -1,0 +1,235 @@
+/*
+ * UrbanCart — Admin Orders Management Page Styles
+ */
+
+.admin-orders-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.admin-orders-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: left;
+}
+
+.admin-orders-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Table Wrapper for Horizontal Scrolling on Mobile */
+.admin-table-container {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 800px; /* Ensures table doesn't squish too much on smaller screens */
+}
+
+/* Table Headings */
+.admin-orders-table th {
+  background-color: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1.5px solid var(--color-border);
+}
+
+/* Table Cells */
+.admin-orders-table td {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  vertical-align: middle;
+}
+
+/* Row Hover Interaction */
+.admin-orders-table tr:hover td {
+  background-color: #fafbfc;
+}
+
+/* Order ID formatting */
+.order-id-txt {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+/* Customer info block */
+.customer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-name {
+  font-weight: var(--font-weight-medium);
+}
+
+/* Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xxs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-none);
+}
+
+/* Order Status Badge Variations */
+.badge-order-pending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.badge-order-processing {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.badge-order-shipped {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.badge-order-delivered {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-order-cancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Payment Status Badge Variations */
+.badge-payment-pending {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.badge-payment-paid {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.badge-payment-failed {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Action button styles */
+.admin-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.admin-action-btn:hover {
+  background-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Toolbar & Filtering styling */
+.admin-orders-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.admin-orders-search-input {
+  flex: 1;
+  max-width: 400px;
+  min-width: 200px;
+  padding: 10px 16px;
+  font-size: var(--font-size-body);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-orders-search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.admin-orders-filter-group {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.admin-orders-select {
+  padding: 10px 16px;
+  font-size: var(--font-size-body);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  outline: none;
+  min-width: 180px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-orders-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+@media (max-width: 768px) {
+  .admin-orders-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  
+  .admin-orders-search-input,
+  .admin-orders-filter-group {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .admin-orders-filter-group {
+    flex-direction: column;
+  }
+  
+  .admin-orders-select {
+    width: 100%;
+  }
+}

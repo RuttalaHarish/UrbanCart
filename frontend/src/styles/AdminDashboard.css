@@ -1,0 +1,120 @@
+/*
+ * UrbanCart — Admin Dashboard Page Styles
+ */
+
+.admin-dashboard-page {
+  padding: var(--spacing-xl) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.admin-dashboard-header {
+  margin-bottom: var(--spacing-xxl);
+  text-align: left;
+}
+
+.admin-dashboard-title {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xxs) 0;
+}
+
+.admin-dashboard-welcome {
+  font-size: var(--font-size-subheading);
+  color: var(--color-text-secondary);
+  margin: 0;
+  font-weight: var(--font-weight-regular);
+}
+
+/* Grid Layout for Stats Cards */
+.admin-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (min-width: 640px) {
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Stats Card Card Styles */
+.admin-stats-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-stats-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Card Icon Box Styling */
+.admin-stats-icon-box {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Icon Box Color variations */
+.admin-stats-icon-box--blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.admin-stats-icon-box--amber {
+  background-color: #fffbeb;
+  color: #d97706;
+}
+
+.admin-stats-icon-box--green {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.admin-stats-icon-box--purple {
+  background-color: #faf5ff;
+  color: #7c3aed;
+}
+
+/* Card Information Box */
+.admin-stats-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.admin-stats-label {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-stats-value {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-none);
+}
