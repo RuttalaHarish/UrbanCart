@@ -19,7 +19,12 @@ app.use(
   cors({
     origin: [
       'http://localhost:5173',
-      'http://localhost:5174'
+      'http://localhost:5174',
+
+      // Vercel Production Domains
+      'https://urban-cart-beige.vercel.app',
+      'https://urban-cart-8pix5q7b0-ruttala-harish.vercel.app',
+      'https://urban-cart-git-main-ruttala-harish.vercel.app'
     ],
     credentials: true,
   })
