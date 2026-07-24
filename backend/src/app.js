@@ -26,7 +26,8 @@ app.use(
       // Vercel Production Domains
       'https://urban-cart-beige.vercel.app',
       'https://urban-cart-8pix5q7b0-ruttala-harish.vercel.app',
-      'https://urban-cart-git-main-ruttala-harish.vercel.app'
+      'https://urban-cart-git-main-ruttala-harish.vercel.app',
+      'https://urban-cart-k68uljhjd-ruttala-harish.vercel.app'
     ],
     credentials: true,
   })
