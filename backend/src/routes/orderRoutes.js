@@ -1,7 +1,7 @@
 const express = require('express');
 const {
   createOrder,
-  getOrders,
+  getUserOrders,
   getOrderById,
   getAllOrders,
   updateOrderStatus,
@@ -17,7 +17,7 @@ const router = express.Router();
 router.use(protect);
 
 router.route('/')
-  .get(getOrders)
+  .get(getUserOrders)
   .post(createOrder);
 
 // Admin-only route to get all orders (Must be before /:id)
