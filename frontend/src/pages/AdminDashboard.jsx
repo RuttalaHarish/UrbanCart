@@ -218,8 +218,8 @@ function AdminDashboard() {
         api.get(CATEGORY_ENDPOINTS.LIST),
       ]);
 
-      if (statsRes.data && statsRes.data.stats) {
-        setStats(statsRes.data.stats);
+      if (statsRes.data && statsRes.data.data) {
+        setStats(statsRes.data.data);
       } else {
         throw new Error('Invalid statistics response');
       }
@@ -348,8 +348,8 @@ function AdminDashboard() {
   const monthlyRevenue = useMemo(() => {
     return salesAnalytics.rangeRevenue > 0
       ? salesAnalytics.rangeRevenue
-      : Number(stats?.revenue || 0);
-  }, [salesAnalytics.rangeRevenue, stats?.revenue]);
+      : Number(stats?.totalRevenue || stats?.revenue || 0);
+  }, [salesAnalytics.rangeRevenue, stats?.totalRevenue, stats?.revenue]);
 
   const revenueTrendData = useMemo(() => {
     const trendList = [];
