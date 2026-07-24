@@ -45,11 +45,11 @@ export const ORDER_ENDPOINTS = {
   CANCEL: (id) => `/orders/${id}/cancel`,
   DELETE: (id) => `/orders/${id}`,
   DASHBOARD_STATS: '/orders/dashboard/stats',
-  RAZORPAY_CREATE: '/orders/razorpay',
-  RAZORPAY_VERIFY: '/orders/verify',
+  RAZORPAY_CREATE: '/payments/create-order',
+  RAZORPAY_VERIFY: '/payments/verify',
 };
 
 export const PAYMENT_ENDPOINTS = {
-  CREATE_ORDER: '/orders/razorpay',
-  VERIFY: '/orders/verify',
+  CREATE_ORDER: '/payments/create-order',
+  VERIFY: '/payments/verify',
 };
