@@ -4,18 +4,34 @@
 
 const crypto = require('crypto');
 const razorpayInstance = require('../config/razorpay');
+const Order = require('../models/Order');
+const Cart = require('../models/Cart');
 
 /**
- * @desc    Create a new Razorpay order ID
+ * @desc    Create a new Razorpay order ID linked to a MongoDB order
  * @route   POST /api/payments/create-order
  * @access  Private
  */
 const createRazorpayOrder = async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { orderId, amount } = req.body;
+
+    let targetOrder = null;
+    let paymentAmount = amount;
+
+    if (orderId) {
+      targetOrder = await Order.findById(orderId);
+      if (!targetOrder) {
+        return res.status(404).json({
+          success: false,
+          message: 'Associated order not found',
+        });
+      }
+      paymentAmount = targetOrder.totalAmount;
+    }
 
     // 1. Validation check
-    if (!amount || isNaN(amount) || amount <= 0) {
+    if (!paymentAmount || isNaN(paymentAmount) || paymentAmount <= 0) {
       return res.status(400).json({
         success: false,
         message: 'Please provide a valid payment amount',
@@ -23,10 +39,12 @@ const createRazorpayOrder = async (req, res) => {
     }
 
     // 2. Convert amount to paise (1 INR = 100 paise)
-    const amountInPaise = Math.round(amount * 100);
+    const amountInPaise = Math.round(paymentAmount * 100);
 
     // 3. Create unique receipt ID
-    const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const receiptId = orderId
+      ? `rcpt_${orderId.toString().slice(-12)}`
+      : `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     // 4. Configure order options
     const options = {
@@ -36,11 +54,17 @@ const createRazorpayOrder = async (req, res) => {
     };
 
     // 5. Initialize order with Razorpay Instance
-    const order = await razorpayInstance.orders.create(options);
+    const razorpayOrder = await razorpayInstance.orders.create(options);
+
+    // 6. Save Razorpay Order ID to MongoDB document
+    if (targetOrder) {
+      targetOrder.razorpayOrderId = razorpayOrder.id;
+      await targetOrder.save();
+    }
 
     return res.status(201).json({
       success: true,
-      data: order,
+      data: razorpayOrder,
     });
   } catch (error) {
     console.error('Create Razorpay Order Error:', error.message);
@@ -53,13 +77,13 @@ const createRazorpayOrder = async (req, res) => {
 };
 
 /**
- * @desc    Verify Razorpay payment signature
+ * @desc    Verify Razorpay payment signature & update MongoDB order to Paid
  * @route   POST /api/payments/verify
  * @access  Private
  */
 const verifyPayment = async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const { orderId, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     // 1. Verification input validation checks
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -80,11 +104,45 @@ const verifyPayment = async (req, res) => {
 
     // 4. Compare generated signature with incoming signature safely
     if (generatedSignature === razorpay_signature) {
+      // 5. Find target MongoDB order by orderId or razorpay_order_id
+      let targetOrder = null;
+      if (orderId) {
+        targetOrder = await Order.findById(orderId);
+      }
+      if (!targetOrder && razorpay_order_id) {
+        targetOrder = await Order.findOne({ razorpayOrderId: razorpay_order_id });
+      }
+
+      if (targetOrder) {
+        targetOrder.paymentStatus = 'Paid';
+        targetOrder.razorpayOrderId = razorpay_order_id;
+        targetOrder.razorpayPaymentId = razorpay_payment_id;
+        targetOrder.razorpaySignature = razorpay_signature;
+        await targetOrder.save();
+
+        // Clear user's cart upon successful verification
+        await Cart.findOneAndUpdate(
+          { user: targetOrder.user },
+          { $set: { items: [] } }
+        );
+      }
+
       return res.status(200).json({
         success: true,
-        message: 'Payment verified successfully',
+        message: 'Payment verified successfully and order marked as Paid',
+        data: targetOrder,
       });
     } else {
+      // Signature verification failed — mark order payment status as Failed
+      if (orderId) {
+        await Order.findByIdAndUpdate(orderId, { paymentStatus: 'Failed' });
+      } else if (razorpay_order_id) {
+        await Order.findOneAndUpdate(
+          { razorpayOrderId: razorpay_order_id },
+          { paymentStatus: 'Failed' }
+        );
+      }
+
       return res.status(400).json({
         success: false,
         message: 'Invalid payment signature.',

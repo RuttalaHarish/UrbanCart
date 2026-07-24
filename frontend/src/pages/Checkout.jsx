@@ -124,18 +124,41 @@ function Checkout() {
         return;
       }
 
+      setPlacing(true);
       try {
-        const paymentResponse = await api.post(PAYMENT_ENDPOINTS.CREATE_ORDER, {
-          amount: grandTotal,
+        // Step 1: Create Pending MongoDB order
+        const orderResponse = await api.post(ORDER_ENDPOINTS.CREATE, {
+          shippingAddress: {
+            fullName: form.fullName,
+            phone: form.phone,
+            address: form.address,
+            city: form.city,
+            state: form.state,
+            postalCode: form.zip,
+            country: 'US',
+          },
+          paymentMethod: 'RAZORPAY',
         });
 
+        const createdOrder = orderResponse.data.data;
+        const dbOrderId = createdOrder._id;
+
+        // Step 2: Initialize Razorpay Order ID with backend
+        const paymentResponse = await api.post(PAYMENT_ENDPOINTS.CREATE_ORDER, {
+          orderId: dbOrderId,
+          amount: createdOrder.totalAmount || grandTotal,
+        });
+
+        const rzpData = paymentResponse.data.data;
+
+        // Step 3: Configure and open Razorpay modal
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: paymentResponse.data.data.amount,
-          currency: paymentResponse.data.data.currency,
+          amount: rzpData.amount,
+          currency: rzpData.currency,
           name: 'UrbanCart',
-          description: 'UrbanCart Purchase',
-          order_id: paymentResponse.data.data.id,
+          description: `Order #${dbOrderId}`,
+          order_id: rzpData.id,
           prefill: {
             name: form.fullName || user?.name || '',
             email: form.email || user?.email || '',
@@ -146,51 +169,51 @@ function Checkout() {
           },
           handler: async function (response) {
             try {
+              // Step 4: Verify HMAC signature & set paymentStatus = Paid
               await api.post(PAYMENT_ENDPOINTS.VERIFY, {
+                orderId: dbOrderId,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               });
 
-              const orderResponse = await api.post(ORDER_ENDPOINTS.CREATE, {
-                shippingAddress: {
-                  fullName: form.fullName,
-                  phone: form.phone,
-                  address: form.address,
-                  city: form.city,
-                  state: form.state,
-                  postalCode: form.zip,
-                  country: 'US',
-                },
-                paymentMethod: 'RAZORPAY',
-              });
-
-              console.log('Order Created:', orderResponse.data);
+              // Step 5: Clear local cart & show order success UI
               clearCart();
               setPlaced(true);
-              toast.success('Order placed successfully! 🎉');
+              toast.success('Payment verified & order placed successfully! 🎉');
             } catch (error) {
-              if (error.response?.status === 409 || error.response?.data?.cartUpdated) {
-                await fetchCart();
-                toast.warn(
-                  'Some unavailable products were removed from your cart. Please review your cart before placing the order.'
-                );
-                return;
-              }
-              console.error('Payment Verification / Order Creation Failed:', error);
-              toast.error(error.response?.data?.message || 'Failed to create order.');
+              console.error('Payment Verification Failed:', error);
+              toast.error(error.response?.data?.message || 'Payment verification failed.');
+            } finally {
+              setPlacing(false);
             }
           },
+          modal: {
+            ondismiss: function () {
+              setPlacing(false);
+              toast.info('Payment cancelled. Your order remains pending in My Orders.');
+            },
+          },
         };
+
         const rzp = new window.Razorpay(options);
         rzp.on('payment.failed', function (response) {
           console.error('Payment Failed:', response.error);
+          setPlacing(false);
           toast.error('Payment failed. Please try again.');
         });
         rzp.open();
       } catch (err) {
-        console.error('Error creating Razorpay order:', err);
-        toast.error(err.response?.data?.message || 'Failed to create Razorpay order.');
+        setPlacing(false);
+        if (err.response?.status === 409 || err.response?.data?.cartUpdated) {
+          await fetchCart();
+          toast.warn(
+            'Some unavailable products were removed from your cart. Please review your cart before placing the order.'
+          );
+          return;
+        }
+        console.error('Error in Razorpay checkout flow:', err);
+        toast.error(err.response?.data?.message || 'Failed to initialize payment.');
       }
       return;
     }
