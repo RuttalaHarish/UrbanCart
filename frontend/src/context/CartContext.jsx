@@ -8,6 +8,14 @@ import { useAuth } from './AuthContext';
 ───────────────────────────────────────── */
 const CartContext = createContext(null);
 
+/* Helper function to filter out invalid or unpopulated products */
+const normalizeCartItems = (rawItems) => {
+  if (!Array.isArray(rawItems)) return [];
+  return rawItems.filter(
+    (item) => item && item.product !== null && item.product !== undefined
+  );
+};
+
 /* ─────────────────────────────────────────
    Provider
 ───────────────────────────────────────── */
@@ -17,7 +25,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  /* ── Derived: total number of units across all items ── */
+  /* ── Derived: total number of units across all valid items ── */
   const cartCount = cartItems.reduce((acc, item) => acc + (item.quantity ?? 0), 0);
 
   /* ─────────────────────────────────────
@@ -33,7 +41,9 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await api.get(CART_ENDPOINTS.GET);
       if (response.data?.data) {
-        setCartItems(response.data.data.items || []);
+        const rawItems = response.data.data.items || [];
+        const validItems = normalizeCartItems(rawItems);
+        setCartItems(validItems);
       }
     } catch (err) {
       // Silently fail — individual pages handle their own error UI
@@ -52,7 +62,9 @@ export const CartProvider = ({ children }) => {
   const addToCart = useCallback(async (productId, quantity = 1) => {
     const response = await api.post(CART_ENDPOINTS.ADD, { productId, quantity });
     if (response.data?.data) {
-      setCartItems(response.data.data.items || []);
+      const rawItems = response.data.data.items || [];
+      const validItems = normalizeCartItems(rawItems);
+      setCartItems(validItems);
     }
   }, []);
 
@@ -63,7 +75,9 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = useCallback(async (productId) => {
     const response = await api.delete(CART_ENDPOINTS.REMOVE(productId));
     if (response.data?.data) {
-      setCartItems(response.data.data.items || []);
+      const rawItems = response.data.data.items || [];
+      const validItems = normalizeCartItems(rawItems);
+      setCartItems(validItems);
     }
   }, []);
 
@@ -74,7 +88,9 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = useCallback(async (productId, quantity) => {
     const response = await api.put(CART_ENDPOINTS.UPDATE(productId), { quantity });
     if (response.data?.data) {
-      setCartItems(response.data.data.items || []);
+      const rawItems = response.data.data.items || [];
+      const validItems = normalizeCartItems(rawItems);
+      setCartItems(validItems);
     }
   }, []);
 

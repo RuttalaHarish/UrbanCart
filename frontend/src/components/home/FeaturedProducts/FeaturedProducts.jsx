@@ -15,7 +15,6 @@ function FeaturedProducts() {
     setError(null);
     try {
       const response = await api.get(PRODUCT_ENDPOINTS.LIST);
-      // API returns { success: true, count: X, data: [ ... ] }
       if (response.data && Array.isArray(response.data.data)) {
         setProducts(response.data.data);
       } else {
@@ -35,23 +34,33 @@ function FeaturedProducts() {
 
   return (
     <section className="featured-products" id="featured-products">
-      {/* Header */}
+      {/* Section Header */}
       <div className="featured-products-header">
-        <span className="featured-products-badge">Our Picks</span>
+        <span className="featured-products-badge">Hand-picked</span>
         <h2 className="featured-products-title">Featured Products</h2>
         <p className="featured-products-subtitle">
-          Explore our top recommendation products curated just for you.
+          Hand-picked products recommended for you.
         </p>
       </div>
 
-      {/* States: Loading, Error, Empty, Grid */}
+      {/* Professional Product Card Skeleton Loader */}
       {loading && (
-        <div className="featured-products-loader">
-          <div className="featured-products-spinner" />
-          <p>Loading Products...</p>
+        <div className="featured-products-grid">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="product-card-skeleton">
+              <div className="skeleton-media" />
+              <div className="skeleton-body">
+                <div className="skeleton-badge-line" />
+                <div className="skeleton-title" />
+                <div className="skeleton-price" />
+                <div className="skeleton-actions" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
+      {/* Error Message Box */}
       {!loading && error && (
         <div className="featured-products-message">
           <FiAlertCircle className="featured-products-message-icon" />
@@ -63,6 +72,7 @@ function FeaturedProducts() {
         </div>
       )}
 
+      {/* Empty State Box */}
       {!loading && !error && products.length === 0 && (
         <div className="featured-products-message">
           <FiInbox className="featured-products-message-icon" />
@@ -73,6 +83,7 @@ function FeaturedProducts() {
         </div>
       )}
 
+      {/* MongoDB Products Responsive Grid (All Available Shop Products) */}
       {!loading && !error && products.length > 0 && (
         <div className="featured-products-grid">
           {products.map((product) => (

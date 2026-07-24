@@ -59,16 +59,84 @@ const createProduct = async (req, res) => {
 };
 
 /**
- * @desc    Get all products
+ * @desc    Get all products with search, category/price filtering, sorting, and backend pagination
  * @route   GET /api/products
  * @access  Public
  */
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({}).populate('createdBy', 'name email');
+    const { q, keyword, category, minPrice, maxPrice, sort } = req.query;
+
+    // 1. Read and validate pagination parameters (default page: 1, default limit: 12)
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit, 10) || 12);
+    const skip = (page - 1) * limit;
+
+    const queryObject = {};
+
+    // 2. Keyword search (case-insensitive across name, description, brand, category)
+    const searchParam = (q || keyword || '').trim();
+    if (searchParam) {
+      const regex = new RegExp(searchParam, 'i');
+      queryObject.$or = [
+        { name: regex },
+        { description: regex },
+        { brand: regex },
+        { category: regex },
+      ];
+    }
+
+    // 3. Category filter (case-insensitive exact match)
+    if (category && category.trim()) {
+      queryObject.category = new RegExp(`^${category.trim()}$`, 'i');
+    }
+
+    // 4. Price range filter ($gte, $lte)
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      queryObject.price = {};
+      if (minPrice !== undefined && minPrice !== '' && !isNaN(Number(minPrice))) {
+        queryObject.price.$gte = Number(minPrice);
+      }
+      if (maxPrice !== undefined && maxPrice !== '' && !isNaN(Number(maxPrice))) {
+        queryObject.price.$lte = Number(maxPrice);
+      }
+      if (Object.keys(queryObject.price).length === 0) {
+        delete queryObject.price;
+      }
+    }
+
+    // 5. Sorting options (using _id as a secondary tie-breaker for deterministic stable pagination)
+    let sortOptions = { createdAt: -1, _id: -1 }; // Default: newest
+    if (sort === 'price-asc') {
+      sortOptions = { price: 1, _id: 1 };
+    } else if (sort === 'price-desc') {
+      sortOptions = { price: -1, _id: -1 };
+    } else if (sort === 'newest') {
+      sortOptions = { createdAt: -1, _id: -1 };
+    } else if (sort === 'name-asc') {
+      sortOptions = { name: 1, _id: 1 };
+    } else if (sort === 'name-desc') {
+      sortOptions = { name: -1, _id: -1 };
+    }
+
+    // 6. Calculate total document count matching all active filters
+    const totalProducts = await Product.countDocuments(queryObject);
+    const totalPages = Math.ceil(totalProducts / limit) || 1;
+
+    // 7. Execute paginated query with population, sorting, skip and limit
+    const products = await Product.find(queryObject)
+      .populate('createdBy', 'name email')
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
     return res.status(200).json({
       success: true,
       count: products.length,
+      totalProducts,
+      currentPage: page,
+      totalPages,
+      limit,
       data: products,
     });
   } catch (error) {

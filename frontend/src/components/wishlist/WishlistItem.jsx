@@ -1,4 +1,5 @@
 import { FiImage, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
+import { formatCurrency } from '../../utils/formatCurrency';
 import './WishlistItem.css';
 
 function WishlistItem({ item, onMoveToCart, onRemove, isMoving }) {
@@ -30,7 +31,7 @@ function WishlistItem({ item, onMoveToCart, onRemove, isMoving }) {
       </div>
 
       {/* Single Price */}
-      <div className="wishlist-item-price">${price.toFixed(2)}</div>
+      <div className="wishlist-item-price">{formatCurrency(price)}</div>
 
       {/* Stock status badge */}
       <div>

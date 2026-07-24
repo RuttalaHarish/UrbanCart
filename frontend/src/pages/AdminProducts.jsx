@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiPlus, FiEdit, FiTrash2, FiImage, FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FiPlus, FiEdit, FiTrash2, FiImage } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
-import { ORDER_STATUSES, PAYMENT_STATUSES, PRODUCT_ENDPOINTS, LOW_STOCK_THRESHOLD } from '../constants';
+import { PRODUCT_ENDPOINTS, LOW_STOCK_THRESHOLD } from '../constants';
 import { Loading, ErrorState } from '../components/common';
+import { formatCurrency } from '../utils/formatCurrency';
 import '../styles/AdminProducts.css';
 
 function AdminProducts() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const stockParam = searchParams.get('stock');
+  const viewParam = searchParams.get('view');
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,24 +74,33 @@ function AdminProducts() {
     ...new Set(products.map((product) => product.category).filter(Boolean)),
   ];
 
-  // Derive filtered products based on search AND category filters
+  // Derive filtered products based on search, category, AND URL stock query parameters
   const filteredProducts = products.filter((product) => {
+    const currentStock = Number(product.stock ?? 0);
+
+    // 1. Stock URL Parameter Filter (evaluated first with explicit Number conversion)
+    let matchesStock = true;
+    if (stockParam === 'low') {
+      matchesStock = currentStock <= (LOW_STOCK_THRESHOLD || 10);
+    } else if (stockParam === 'out') {
+      matchesStock = currentStock === 0;
+    }
+
+    // 2. Search Query filter
     const q = searchQuery.toLowerCase().trim();
-    
-    // 1. Search Query filter (name, brand, or category string matching)
-    const matchesSearch = !q || (
+    const matchesSearch =
+      !q ||
       (product.name && product.name.toLowerCase().includes(q)) ||
       (product.brand && product.brand.toLowerCase().includes(q)) ||
-      (product.category && product.category.toLowerCase().includes(q))
-    );
+      (product.category && product.category.toLowerCase().includes(q));
 
-    // 2. Category selection filter
+    // 3. Category selection filter
     const matchesCategory =
       !selectedCategory ||
       selectedCategory === 'All Categories' ||
       product.category === selectedCategory;
 
-    return matchesSearch && matchesCategory;
+    return matchesStock && matchesSearch && matchesCategory;
   });
 
   if (loading) {
@@ -97,13 +111,31 @@ function AdminProducts() {
     return <ErrorState message={error} onRetry={fetchProducts} />;
   }
 
+  // Dynamic Header Titles & Subtitles based on active URL query parameters
+  let pageTitle = 'Products Management';
+  let pageSubtitle = 'Manage all products in your store';
+  let emptyStateMessage = 'No products found matching your search.';
+
+  if (stockParam === 'low') {
+    pageTitle = 'Low Stock Products';
+    pageSubtitle = `Products with stock level at or below ${LOW_STOCK_THRESHOLD} units`;
+    emptyStateMessage = 'No low stock products found.';
+  } else if (stockParam === 'out') {
+    pageTitle = 'Out of Stock Products';
+    pageSubtitle = 'Products currently with 0 inventory stock';
+    emptyStateMessage = 'No out of stock products found.';
+  } else if (viewParam === 'categories') {
+    pageTitle = 'Products by Category';
+    pageSubtitle = 'Filter and organize products by category';
+  }
+
   return (
     <div className="container admin-products-page">
       {/* Header Block */}
       <div className="admin-products-header">
         <div className="admin-products-title-group">
-          <h1 className="admin-products-title">Products Management</h1>
-          <p className="admin-products-subtitle">Manage all products in your store</p>
+          <h1 className="admin-products-title">{pageTitle}</h1>
+          <p className="admin-products-subtitle">{pageSubtitle}</p>
         </div>
         <button
           type="button"
@@ -141,7 +173,13 @@ function AdminProducts() {
       {/* Table Section */}
       <div className="admin-table-container">
         {products.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px var(--spacing-lg)', color: 'var(--color-text-secondary)' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '60px var(--spacing-lg)',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             No products available.
           </div>
         ) : (
@@ -168,12 +206,15 @@ function AdminProducts() {
                       color: 'var(--color-text-secondary)',
                     }}
                   >
-                    No products found matching your search.
+                    {emptyStateMessage}
                   </td>
                 </tr>
               ) : (
                 filteredProducts.map((product) => {
-                  const image = product.images && product.images.length > 0 ? product.images[0] : null;
+                  const image =
+                    product.images && product.images.length > 0
+                      ? product.images[0]
+                      : null;
 
                   // Derived Stock Status info
                   let status = 'In Stock';
@@ -199,7 +240,11 @@ function AdminProducts() {
                             <img
                               src={image}
                               alt={product.name}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
                             />
                           ) : (
                             <FiImage size={20} />
@@ -214,7 +259,9 @@ function AdminProducts() {
                       <td>{product.category}</td>
 
                       {/* Price */}
-                      <td style={{ fontWeight: '600' }}>₹{product.price}</td>
+                      <td style={{ fontWeight: '600' }}>
+                        {formatCurrency(product.price)}
+                      </td>
 
                       {/* Stock Count */}
                       <td className={stockClass}>{product.stock}</td>
@@ -231,7 +278,9 @@ function AdminProducts() {
                             type="button"
                             className="admin-table-action-btn admin-table-action-btn--edit"
                             aria-label={`Edit ${product.name}`}
-                            onClick={() => navigate(`/admin/products/${product._id}/edit`)}
+                            onClick={() =>
+                              navigate(`/admin/products/${product._id}/edit`)
+                            }
                             disabled={deletingId !== null}
                           >
                             <FiEdit size={14} />

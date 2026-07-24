@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { SHIPPING_THRESHOLD, SHIPPING_FEE, CURRENCY_SYMBOL_CUSTOMER } from '../../constants';
+import { SHIPPING_THRESHOLD, SHIPPING_FEE } from '../../constants';
+import { formatCurrency } from '../../utils/formatCurrency';
 import './CartSummary.css';
 
 function CartSummary({ items = [] }) {
@@ -21,7 +22,7 @@ function CartSummary({ items = [] }) {
         {/* Total Items */}
         <div className="cart-summary-row">
           <span>Items ({totalItems})</span>
-          <span className="cart-summary-row-bold">{CURRENCY_SYMBOL_CUSTOMER}{subtotal.toFixed(2)}</span>
+          <span className="cart-summary-row-bold">{formatCurrency(subtotal)}</span>
         </div>
 
         {/* Shipping details */}
@@ -30,13 +31,13 @@ function CartSummary({ items = [] }) {
           {shippingFee === 0 ? (
             <span className="cart-summary-row-free">Free</span>
           ) : (
-            <span className="cart-summary-row-bold">{CURRENCY_SYMBOL_CUSTOMER}{shippingFee.toFixed(2)}</span>
+            <span className="cart-summary-row-bold">{formatCurrency(shippingFee)}</span>
           )}
         </div>
 
         {shippingFee > 0 && (
           <div className="cart-summary-row" style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>
-            <span>Free shipping on orders over {CURRENCY_SYMBOL_CUSTOMER}{SHIPPING_THRESHOLD}</span>
+            <span>Free shipping on orders over {formatCurrency(SHIPPING_THRESHOLD)}</span>
           </div>
         )}
 
@@ -45,7 +46,7 @@ function CartSummary({ items = [] }) {
         {/* Grand Total */}
         <div className="cart-summary-row cart-summary-row-total">
           <span>Total</span>
-          <span className="cart-summary-row-total-val">{CURRENCY_SYMBOL_CUSTOMER}{grandTotal.toFixed(2)}</span>
+          <span className="cart-summary-row-total-val">{formatCurrency(grandTotal)}</span>
         </div>
       </div>
 

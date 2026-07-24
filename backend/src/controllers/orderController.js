@@ -37,79 +37,91 @@ const createOrder = async (req, res) => {
       });
     }
 
+    // 2b. Auto-Cleanup: Detect and remove invalid/deleted products
+    const initialItemCount = cart.items.length;
+    const validItems = cart.items.filter((item) => item.product !== null);
+
+    if (validItems.length < initialItemCount) {
+      // Map valid items to store product ObjectIds back to cart document
+      cart.items = validItems.map((item) => ({
+        product: item.product._id || item.product,
+        quantity: item.quantity,
+      }));
+      await cart.save();
+
+      return res.status(409).json({
+        success: false,
+        cartUpdated: true,
+        message:
+          'Some products in your cart are no longer available. They have been removed automatically. Please review your cart before placing your order.',
+      });
+    }
+
     // 3. Process items and calculate total amount
     let totalAmount = 0;
     const orderItems = [];
 
     for (const item of cart.items) {
-      if (!item.product) {
-        return res.status(400).json({
-          success: false,
-          message: 'Cart contains an invalid or missing product',
-        });
-      }
-      
-      const price = item.product.price;
-      totalAmount += price * item.quantity;
+      const itemTotal = item.product.price * item.quantity;
+      totalAmount += itemTotal;
 
       orderItems.push({
         product: item.product._id,
         quantity: item.quantity,
-        priceAtPurchase: price,
+        priceAtPurchase: item.product.price,
       });
     }
 
-    // 4. Create the Order document
-    const order = await Order.create({
+    // 4. Create and save order
+    const order = new Order({
       user: req.user._id,
       items: orderItems,
-      totalAmount: Math.round(totalAmount * 100) / 100, // round to 2 decimal points
       shippingAddress,
       paymentMethod: paymentMethod || 'COD',
-      orderStatus: 'Pending',
-      paymentStatus: 'Pending',
+      totalAmount,
     });
 
-    // 5. Clear the user's cart items
+    const savedOrder = await order.save();
+
+    // 5. Clear user's cart
     cart.items = [];
     await cart.save();
 
-    // 6. Populate product details and return
-    await order.populate('items.product');
-
     return res.status(201).json({
       success: true,
-      data: order,
+      message: 'Order created successfully',
+      data: savedOrder,
     });
   } catch (error) {
     console.error('Create Order Error:', error.message);
     return res.status(500).json({
       success: false,
-      message: 'Server error during order creation',
-      error: error.message,
+      message: 'Server error while creating order.',
     });
   }
 };
 
 /**
- * @desc    Get logged-in user's orders
+ * @desc    Get logged in user orders
  * @route   GET /api/orders
  * @access  Private
  */
 const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).populate('items.product');
+    const orders = await Order.find({ user: req.user._id })
+      .populate('items.product', 'name images brand price category')
+      .sort({ createdAt: -1 });
+
     return res.status(200).json({
       success: true,
       count: orders.length,
       data: orders,
     });
   } catch (error) {
-    console.error('Get Orders Error:', error.message);
+    console.error('Get User Orders Error:', error.message);
     return res.status(500).json({
       success: false,
-      message: 'Server error retrieving user orders',
-      error: error.message,
+      message: 'Server error while fetching user orders.',
     });
   }
 };
@@ -117,37 +129,35 @@ const getOrders = async (req, res) => {
 /**
  * @desc    Get order details by ID
  * @route   GET /api/orders/:id
- * @access  Private (Owner or Admin)
+ * @access  Private
  */
 const getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1. Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid order ID format',
+        message: 'Invalid order ID format.',
       });
     }
 
-    // 2. Fetch Order
-    const order = await Order.findById(id).populate('items.product');
+    const order = await Order.findById(id)
+      .populate('user', 'name email')
+      .populate('items.product', 'name images brand price category');
+
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: 'Order not found',
+        message: 'Order not found.',
       });
     }
 
-    // 3. Owner or Admin authorization check
-    if (
-      order.user.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
+    // Check authorization: User can only view their own order unless Admin
+    if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to view this order',
+        message: 'Not authorized to view this order.',
       });
     }
 
@@ -156,25 +166,25 @@ const getOrderById = async (req, res) => {
       data: order,
     });
   } catch (error) {
-    console.error('Get Order Detail Error:', error.message);
+    console.error('Get Order By ID Error:', error.message);
     return res.status(500).json({
       success: false,
-      message: 'Server error retrieving order detail',
-      error: error.message,
+      message: 'Server error while fetching order details.',
     });
   }
 };
 
 /**
- * @desc    Get all orders
+ * @desc    Get all orders for admin
  * @route   GET /api/orders/all
  * @access  Private (Admin only)
  */
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({})
-      .populate('items.product')
-      .populate('user', 'name email');
+    const orders = await Order.find()
+      .populate('user', 'name email')
+      .populate('items.product', 'name images brand price category')
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
@@ -182,79 +192,161 @@ const getAllOrders = async (req, res) => {
       data: orders,
     });
   } catch (error) {
-    console.error('Admin Get All Orders Error:', error.message);
+    console.error('Get All Orders Error:', error.message);
     return res.status(500).json({
       success: false,
-      message: 'Server error retrieving all orders',
-      error: error.message,
+      message: 'Server error while fetching all orders.',
     });
   }
 };
 
 /**
- * @desc    Update order status or payment status
+ * @desc    Update order status by admin
  * @route   PUT /api/orders/:id/status
  * @access  Private (Admin only)
  */
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { orderStatus, paymentStatus } = req.body;
+    const { orderStatus } = req.body;
 
-    // 1. Validate ObjectId
+    const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+    if (!orderStatus || !validStatuses.includes(orderStatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid order status.',
+      });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid order ID format',
+        message: 'Invalid order ID format.',
       });
     }
 
-    // 2. Fetch Order
     const order = await Order.findById(id);
+
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: 'Order not found',
+        message: 'Order not found.',
       });
     }
 
-    // 3. Update values
-    if (orderStatus) {
-      const validOrderStatus = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-      if (!validOrderStatus.includes(orderStatus)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid orderStatus. Must be one of: ${validOrderStatus.join(', ')}`,
-        });
-      }
-      order.orderStatus = orderStatus;
-    }
-
-    if (paymentStatus) {
-      const validPaymentStatus = ['Pending', 'Paid', 'Failed'];
-      if (!validPaymentStatus.includes(paymentStatus)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid paymentStatus. Must be one of: ${validPaymentStatus.join(', ')}`,
-        });
-      }
-      order.paymentStatus = paymentStatus;
-    }
-
-    // 4. Save and return updated order
-    await order.save();
-    await order.populate('items.product');
+    order.orderStatus = orderStatus;
+    const updatedOrder = await order.save();
 
     return res.status(200).json({
       success: true,
-      data: order,
+      message: 'Order status updated successfully',
+      data: updatedOrder,
     });
   } catch (error) {
     console.error('Update Order Status Error:', error.message);
     return res.status(500).json({
       success: false,
-      message: 'Server error updating order status',
-      error: error.message,
+      message: 'Server error while updating order status.',
+    });
+  }
+};
+
+/**
+ * @desc    Cancel a customer order
+ * @route   PUT /api/orders/:id/cancel
+ * @access  Private (Customer/Admin)
+ */
+const cancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid order ID format.',
+      });
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found.',
+      });
+    }
+
+    // Ownership check: customer can only cancel their own order, or admin
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to cancel this order.',
+      });
+    }
+
+    // Business Rule: Allow cancellation ONLY when orderStatus === 'Pending'
+    if (order.orderStatus !== 'Pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only pending orders can be cancelled.',
+      });
+    }
+
+    order.orderStatus = 'Cancelled';
+    const updatedOrder = await order.save();
+    await updatedOrder.populate('items.product', 'name images brand price category');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Order cancelled successfully',
+      data: updatedOrder,
+    });
+  } catch (error) {
+    console.error('Cancel Order Error:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while cancelling order.',
+    });
+  }
+};
+
+/**
+ * @desc    Delete an order by ID
+ * @route   DELETE /api/orders/:id
+ * @access  Private (Admin only)
+ */
+const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid order ID format.',
+      });
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found.',
+      });
+    }
+
+    await Order.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Order deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete Order Error:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while deleting order.',
     });
   }
 };
@@ -305,5 +397,7 @@ module.exports = {
   getOrderById,
   getAllOrders,
   updateOrderStatus,
+  cancelOrder,
+  deleteOrder,
   getDashboardStats,
 };

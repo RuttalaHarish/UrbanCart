@@ -70,6 +70,14 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   }, []);
 
+  const updateUser = useCallback((updatedUserData) => {
+    setUser((prevUser) => {
+      const newUser = { ...prevUser, ...updatedUserData };
+      localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+      return newUser;
+    });
+  }, []);
+
   const value = {
     user,
     token,
@@ -78,6 +86,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUser,
   };
 
   return (
@@ -98,4 +107,3 @@ export const useAuth = () => {
 };
 
 export default AuthContext;
-

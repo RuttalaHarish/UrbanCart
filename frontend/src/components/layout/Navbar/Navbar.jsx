@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '../../../context/AuthContext';
 import { useCart } from '../../../context/CartContext';
+import { useWishlist } from '../../../context/WishlistContext';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -26,7 +27,14 @@ const NAV_LINKS = [
 function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
+
+  const isAdmin = user?.role === 'admin';
+
+  const navLinks = isAdmin
+    ? [...NAV_LINKS, { to: '/admin/dashboard', label: 'Admin Dashboard' }]
+    : NAV_LINKS;
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -80,7 +88,7 @@ function Navbar() {
         {/* Desktop Navigation Links */}
         <nav className="navbar-nav">
           <ul className="navbar-links">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <li key={link.to} className="navbar-link-item">
                 <NavLink
                   to={link.to}
@@ -114,6 +122,9 @@ function Navbar() {
           {/* Wishlist */}
           <Link to="/wishlist" className="navbar-wishlist-btn" aria-label="Wishlist">
             <FiHeart size={20} />
+            {wishlistCount > 0 && (
+              <span className="navbar-wishlist-count">{wishlistCount}</span>
+            )}
           </Link>
 
           {/* Cart */}
@@ -136,6 +147,14 @@ function Navbar() {
 
               {profileOpen && (
                 <div className="navbar-profile-dropdown">
+                  <Link
+                    to="/profile"
+                    className="navbar-profile-dropdown__item"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <FiUser size={14} />
+                    My Profile
+                  </Link>
                   <Link
                     to="/my-orders"
                     className="navbar-profile-dropdown__item"
@@ -204,7 +223,7 @@ function Navbar() {
 
         {/* Mobile Nav Links */}
         <ul className="mobile-nav-menu__links">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <li key={link.to} className="mobile-nav-menu__link">
               <NavLink
                 to={link.to}
@@ -228,6 +247,9 @@ function Navbar() {
           >
             <FiHeart size={18} />
             Wishlist
+            {wishlistCount > 0 && (
+              <span className="mobile-nav-badge">{wishlistCount}</span>
+            )}
           </Link>
           <Link
             to="/cart"
@@ -242,6 +264,14 @@ function Navbar() {
 
           {isAuthenticated ? (
             <>
+              <Link
+                to="/profile"
+                className="mobile-nav-menu__action-btn"
+                onClick={() => setMobileOpen(false)}
+              >
+                <FiUser size={18} />
+                My Profile
+              </Link>
               <Link
                 to="/my-orders"
                 className="mobile-nav-menu__action-btn"

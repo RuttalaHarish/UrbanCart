@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiHome, FiShoppingCart, FiCreditCard, FiCheckCircle, FiPackage } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
-import { ORDER_ENDPOINTS, SHIPPING_THRESHOLD, SHIPPING_FEE } from '../constants';
+import { ORDER_ENDPOINTS, SHIPPING_THRESHOLD, SHIPPING_FEE, PAYMENT_ENDPOINTS } from '../constants';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { loadRazorpayScript } from '../utils/loadRazorpayScript';
+import { formatCurrency } from '../utils/formatCurrency';
 import './Checkout.css';
-
-
 
 function Checkout() {
   const navigate = useNavigate();
@@ -18,8 +19,11 @@ function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [phoneError, setPhoneError] = useState('');
 
-  /* ─── Cart state from context ─── */
-  const { cartItems, loading, clearCart } = useCart();
+  /* ─── Auth state to prefill user info ─── */
+  const { user } = useAuth();
+
+  /* ─── Cart state & refresh method from context ─── */
+  const { cartItems, loading, fetchCart, clearCart } = useCart();
 
   /* ─── Redirect to cart if empty ─── */
   useEffect(() => {
@@ -27,17 +31,17 @@ function Checkout() {
       navigate('/cart');
     }
   }, [loading, cartItems, navigate, placed]);
+
   /* ─── Form state ─── */
   const [form, setForm] = useState({
-    fullName: '',
-    email: '',
+    fullName: user?.name || '',
+    email: user?.email || '',
     phone: '',
     address: '',
     city: '',
     state: '',
     zip: '',
   });
-
 
   /* ─── Derived totals from real cart items ─── */
   const subtotal = cartItems.reduce((acc, item) => {
@@ -114,7 +118,80 @@ function Checkout() {
     if (!validate()) return;
 
     if (paymentMethod === 'RAZORPAY') {
-      toast.info('Online payment integration coming soon.');
+      const sdkLoaded = await loadRazorpayScript();
+      if (!sdkLoaded) {
+        toast.error('Failed to load Razorpay SDK.');
+        return;
+      }
+
+      try {
+        const paymentResponse = await api.post(PAYMENT_ENDPOINTS.CREATE_ORDER, {
+          amount: grandTotal,
+        });
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: paymentResponse.data.data.amount,
+          currency: paymentResponse.data.data.currency,
+          name: 'UrbanCart',
+          description: 'UrbanCart Purchase',
+          order_id: paymentResponse.data.data.id,
+          prefill: {
+            name: form.fullName || user?.name || '',
+            email: form.email || user?.email || '',
+            contact: form.phone || user?.phone || '',
+          },
+          theme: {
+            color: '#2563eb',
+          },
+          handler: async function (response) {
+            try {
+              await api.post(PAYMENT_ENDPOINTS.VERIFY, {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+
+              const orderResponse = await api.post(ORDER_ENDPOINTS.CREATE, {
+                shippingAddress: {
+                  fullName: form.fullName,
+                  phone: form.phone,
+                  address: form.address,
+                  city: form.city,
+                  state: form.state,
+                  postalCode: form.zip,
+                  country: 'US',
+                },
+                paymentMethod: 'RAZORPAY',
+              });
+
+              console.log('Order Created:', orderResponse.data);
+              clearCart();
+              setPlaced(true);
+              toast.success('Order placed successfully! 🎉');
+            } catch (error) {
+              if (error.response?.status === 409 || error.response?.data?.cartUpdated) {
+                await fetchCart();
+                toast.warn(
+                  'Some unavailable products were removed from your cart. Please review your cart before placing the order.'
+                );
+                return;
+              }
+              console.error('Payment Verification / Order Creation Failed:', error);
+              toast.error(error.response?.data?.message || 'Failed to create order.');
+            }
+          },
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          console.error('Payment Failed:', response.error);
+          toast.error('Payment failed. Please try again.');
+        });
+        rzp.open();
+      } catch (err) {
+        console.error('Error creating Razorpay order:', err);
+        toast.error(err.response?.data?.message || 'Failed to create Razorpay order.');
+      }
       return;
     }
 
@@ -123,12 +200,12 @@ function Checkout() {
       await api.post(ORDER_ENDPOINTS.CREATE, {
         shippingAddress: {
           fullName: form.fullName,
-          phone:    form.phone,
-          address:  form.address,
-          city:     form.city,
-          state:    form.state,
+          phone: form.phone,
+          address: form.address,
+          city: form.city,
+          state: form.state,
           postalCode: form.zip,
-          country:  'US',
+          country: 'US',
         },
         paymentMethod,
       });
@@ -138,6 +215,13 @@ function Checkout() {
       setPlaced(true);
       toast.success('Order placed successfully! 🎉');
     } catch (err) {
+      if (err.response?.status === 409 || err.response?.data?.cartUpdated) {
+        await fetchCart();
+        toast.warn(
+          'Some unavailable products were removed from your cart. Please review your cart before placing the order.'
+        );
+        return;
+      }
       const message =
         err?.response?.data?.message || 'Failed to place order. Please try again.';
       toast.error(message);
@@ -167,7 +251,6 @@ function Checkout() {
     );
   }
 
-
   /* ─── Success State ─── */
   if (placed) {
     return (
@@ -178,15 +261,14 @@ function Checkout() {
           </div>
           <h2 className="checkout-success-title">Order Placed!</h2>
           <p className="checkout-success-sub">
-            Thank you, <strong>{form.fullName || 'Customer'}</strong>. Your order is confirmed and
-            will be delivered to <strong>{form.city}</strong> shortly.
+            Thank you for shopping with UrbanCart. Your order has been placed and is being processed.
           </p>
           <div className="checkout-success-actions">
-            <Link to="/" className="checkout-success-btn checkout-success-btn--primary">
-              Back to Home
+            <Link to="/my-orders" className="checkout-success-btn checkout-success-btn--primary">
+              <FiPackage size={16} style={{ marginRight: '6px' }} /> View My Orders
             </Link>
-            <Link to="/shop" className="checkout-success-btn checkout-success-btn--secondary">
-              Continue Shopping
+            <Link to="/" className="checkout-success-btn checkout-success-btn--secondary">
+              <FiHome size={16} style={{ marginRight: '6px' }} /> Back to Home
             </Link>
           </div>
         </div>
@@ -196,172 +278,240 @@ function Checkout() {
 
   return (
     <div className="container checkout-page">
-
-      {/* ── Breadcrumb ── */}
+      {/* Breadcrumb */}
       <nav className="checkout-breadcrumb" aria-label="Breadcrumb">
         <Link to="/" className="checkout-breadcrumb__link">
-          <FiHome size={13} /> Home
+          <FiHome size={14} /> Home
         </Link>
         <span className="checkout-breadcrumb__sep">/</span>
         <Link to="/cart" className="checkout-breadcrumb__link">
-          <FiShoppingCart size={13} /> Cart
+          <FiShoppingCart size={14} /> Cart
         </Link>
         <span className="checkout-breadcrumb__sep">/</span>
-        <span className="checkout-breadcrumb__current">
-          <FiCreditCard size={13} /> Checkout
-        </span>
+        <span className="checkout-breadcrumb__current">Checkout</span>
       </nav>
 
-      {/* ── Page Title ── */}
+      {/* Page Header */}
       <div className="checkout-header">
         <span className="checkout-badge">Secure Checkout</span>
         <h1 className="checkout-title">Checkout</h1>
-        <p className="checkout-subtitle">Complete your order by filling in your shipping details.</p>
+        <p className="checkout-subtitle">Fill in your shipping details to complete the order.</p>
       </div>
 
-      {/* ── Two-Column Layout ── */}
       <div className="checkout-grid">
-
-        {/* ════ LEFT — Shipping Information ════ */}
+        {/* Left Column: Forms */}
         <div className="checkout-left">
+          {/* Shipping Address Card */}
           <div className="checkout-card">
             <h2 className="checkout-card-title">
-              <FiPackage size={18} /> Shipping Information
+              <FiHome size={18} /> Shipping Address
             </h2>
 
-            <div className="checkout-form">
-              {/* Row 1 — Full Name + Email */}
+            <form className="checkout-form" onSubmit={(e) => e.preventDefault()}>
+              <div className="checkout-field">
+                <label className="checkout-label">
+                  Full Name <span>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  className="checkout-input"
+                  placeholder="John Doe"
+                  value={form.fullName}
+                  onChange={handleChange}
+                />
+              </div>
+
               <div className="checkout-form-row">
                 <div className="checkout-field">
-                  <label htmlFor="fullName" className="checkout-label">Full Name <span>*</span></label>
+                  <label className="checkout-label">
+                    Email Address <span>*</span>
+                  </label>
                   <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    className="checkout-input"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    autoComplete="name"
-                  />
-                </div>
-                <div className="checkout-field">
-                  <label htmlFor="email" className="checkout-label">Email Address <span>*</span></label>
-                  <input
-                    id="email"
-                    name="email"
                     type="email"
+                    name="email"
                     className="checkout-input"
+                    placeholder="john@example.com"
                     value={form.email}
                     onChange={handleChange}
-                    autoComplete="email"
                   />
+                </div>
+
+                <div className="checkout-field">
+                  <label className="checkout-label">
+                    Phone Number <span>*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    className="checkout-input"
+                    placeholder="10-digit number"
+                    value={form.phone}
+                    onChange={handleChange}
+                  />
+                  {phoneError && (
+                    <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '2px' }}>
+                      {phoneError}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Row 2 — Phone */}
               <div className="checkout-field">
-                <label htmlFor="phone" className="checkout-label">Phone Number <span>*</span></label>
+                <label className="checkout-label">
+                  Street Address <span>*</span>
+                </label>
                 <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  className={`checkout-input ${phoneError ? 'checkout-input--error' : ''}`}
-                  value={form.phone}
-                  onChange={handleChange}
-                  autoComplete="tel"
-                />
-                {phoneError && (
-                  <span className="checkout-field-error" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '4px', display: 'block' }}>
-                    {phoneError}
-                  </span>
-                )}
-              </div>
-
-              {/* Row 3 — Address */}
-              <div className="checkout-field">
-                <label htmlFor="address" className="checkout-label">Street Address <span>*</span></label>
-                <input
-                  id="address"
-                  name="address"
                   type="text"
+                  name="address"
                   className="checkout-input"
+                  placeholder="123 Main Street, Apt 4B"
                   value={form.address}
                   onChange={handleChange}
-                  autoComplete="street-address"
                 />
               </div>
 
-              {/* Row 4 — City / State / ZIP */}
               <div className="checkout-form-row checkout-form-row--three">
                 <div className="checkout-field">
-                  <label htmlFor="city" className="checkout-label">City <span>*</span></label>
+                  <label className="checkout-label">
+                    City <span>*</span>
+                  </label>
                   <input
-                    id="city"
-                    name="city"
                     type="text"
+                    name="city"
                     className="checkout-input"
+                    placeholder="New York"
                     value={form.city}
                     onChange={handleChange}
-                    autoComplete="address-level2"
                   />
                 </div>
+
                 <div className="checkout-field">
-                  <label htmlFor="state" className="checkout-label">State <span>*</span></label>
+                  <label className="checkout-label">
+                    State <span>*</span>
+                  </label>
                   <input
-                    id="state"
-                    name="state"
                     type="text"
+                    name="state"
                     className="checkout-input"
+                    placeholder="NY"
                     value={form.state}
                     onChange={handleChange}
-                    autoComplete="address-level1"
                   />
                 </div>
+
                 <div className="checkout-field">
-                  <label htmlFor="zip" className="checkout-label">ZIP Code <span>*</span></label>
+                  <label className="checkout-label">
+                    ZIP Code <span>*</span>
+                  </label>
                   <input
-                    id="zip"
-                    name="zip"
                     type="text"
+                    name="zip"
                     className="checkout-input"
+                    placeholder="10001"
                     value={form.zip}
                     onChange={handleChange}
-                    autoComplete="postal-code"
                   />
                 </div>
               </div>
+            </form>
+          </div>
+
+          {/* Payment Method Card */}
+          <div className="checkout-card" style={{ marginTop: '1.5rem' }}>
+            <h2 className="checkout-card-title">
+              <FiCreditCard size={18} /> Payment Method
+            </h2>
+
+            <div className="checkout-form" style={{ gap: '0.75rem' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '1rem',
+                  borderRadius: '12px',
+                  border: paymentMethod === 'COD' ? '2px solid #2563eb' : '1px solid #dbe4ee',
+                  backgroundColor: paymentMethod === 'COD' ? '#eff6ff' : '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="COD"
+                  checked={paymentMethod === 'COD'}
+                  onChange={() => setPaymentMethod('COD')}
+                />
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#0f172a' }}>
+                    Cash on Delivery (COD)
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                    Pay in cash upon delivery
+                  </div>
+                </div>
+              </label>
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  padding: '1rem',
+                  borderRadius: '12px',
+                  border: paymentMethod === 'RAZORPAY' ? '2px solid #2563eb' : '1px solid #dbe4ee',
+                  backgroundColor: paymentMethod === 'RAZORPAY' ? '#eff6ff' : '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="RAZORPAY"
+                  checked={paymentMethod === 'RAZORPAY'}
+                  onChange={() => setPaymentMethod('RAZORPAY')}
+                />
+                <div>
+                  <div style={{ fontWeight: '700', fontSize: '0.92rem', color: '#0f172a' }}>
+                    Online Payment (Razorpay)
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                    Pay securely using Cards, UPI, NetBanking, or Wallets
+                  </div>
+                </div>
+              </label>
             </div>
           </div>
         </div>
 
-        {/* ════ RIGHT — Order Summary ════ */}
+        {/* Right Column: Order Summary */}
         <div className="checkout-right">
-          <div className="checkout-card">
+          <div className="checkout-card" style={{ position: 'sticky', top: '2rem' }}>
             <h2 className="checkout-card-title">
               <FiShoppingCart size={18} /> Order Summary
             </h2>
 
-            {/* Product List — real cart items */}
+            {/* Order Items List */}
             <ul className="checkout-order-list">
-              {cartItems.map((item) => {
-                const product = item.product || {};
-                const name = product.name || 'Product';
-                const brand = product.brand || product.category || '';
-                const qty = item.quantity ?? 1;
-                const price = product.price ?? 0;
-                return (
-                  <li key={item._id} className="checkout-order-item">
-                    <div className="checkout-order-item-info">
-                      <span className="checkout-order-item-name">{name}</span>
-                      {brand && <span className="checkout-order-item-brand">{brand}</span>}
-                    </div>
-                    <div className="checkout-order-item-right">
-                      <span className="checkout-order-item-qty">× {qty}</span>
-                      <span className="checkout-order-item-price">${(price * qty).toFixed(2)}</span>
-                    </div>
-                  </li>
-                );
-              })}
+              {cartItems.map((item) => (
+                <li key={item._id || item.product?._id} className="checkout-order-item">
+                  <div className="checkout-order-item-info">
+                    <span className="checkout-order-item-name">{item.product?.name || 'Product'}</span>
+                    {item.product?.brand && (
+                      <span className="checkout-order-item-brand">{item.product.brand}</span>
+                    )}
+                  </div>
+                  <div className="checkout-order-item-right">
+                    <span className="checkout-order-item-qty">x{item.quantity}</span>
+                    <span className="checkout-order-item-price">
+                      {formatCurrency((item.product?.price ?? 0) * (item.quantity ?? 1))}
+                    </span>
+                  </div>
+                </li>
+              ))}
             </ul>
 
             <div className="checkout-summary-divider" />
@@ -370,58 +520,34 @@ function Checkout() {
             <div className="checkout-totals">
               <div className="checkout-totals-row">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatCurrency(subtotal)}</span>
               </div>
+
               <div className="checkout-totals-row">
                 <span>Shipping</span>
-                {shippingFee === 0
-                  ? <span className="checkout-totals-free">Free</span>
-                  : <span>${shippingFee.toFixed(2)}</span>}
+                {shippingFee === 0 ? (
+                  <span className="checkout-totals-free">FREE</span>
+                ) : (
+                  <span>{formatCurrency(shippingFee)}</span>
+                )}
               </div>
+
               {shippingFee > 0 && (
                 <div className="checkout-totals-hint">
-                  Free shipping on orders over ${SHIPPING_THRESHOLD}
+                  Free shipping on orders over {formatCurrency(SHIPPING_THRESHOLD)}
                 </div>
               )}
+
               <div className="checkout-summary-divider" />
+
               <div className="checkout-totals-row checkout-totals-row--grand">
-                <span>Total</span>
-                <span>${grandTotal.toFixed(2)}</span>
+                <span>Grand Total</span>
+                <span>{formatCurrency(grandTotal)}</span>
               </div>
             </div>
 
-            {/* Payment Method Selector */}
-            <div className="checkout-payment-method-section" style={{ marginTop: 'var(--spacing-lg)', marginBottom: 'var(--spacing-lg)' }}>
-              <h3 className="checkout-payment-title" style={{ fontSize: 'var(--font-size-body)', fontWeight: 'var(--font-weight-semibold)', marginBottom: 'var(--spacing-sm)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Payment Method
-              </h3>
-              <div className="checkout-payment-options" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-                <label className="checkout-payment-option" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', cursor: 'pointer', fontSize: 'var(--font-size-small)' }}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="COD"
-                    checked={paymentMethod === 'COD'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>Cash on Delivery (COD)</span>
-                </label>
-                <label className="checkout-payment-option" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', cursor: 'pointer', fontSize: 'var(--font-size-small)' }}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="RAZORPAY"
-                    checked={paymentMethod === 'RAZORPAY'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  <span>Online Payment</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Place Order CTA */}
+            {/* Place Order Button */}
             <button
-              id="place-order-btn"
               type="button"
               className="checkout-place-order-btn"
               onClick={handlePlaceOrder}
@@ -429,19 +555,15 @@ function Checkout() {
             >
               {placing ? (
                 <>
-                  <span className="checkout-spinner" />
-                  Placing Order…
+                  <span className="checkout-spinner" /> Processing Order…
                 </>
               ) : (
-                <>
-                  <FiCreditCard size={16} />
-                  Place Order
-                </>
+                'Place Order'
               )}
             </button>
 
             <p className="checkout-secure-note">
-              🔒 Your information is protected with 256-bit SSL encryption.
+              🔒 Encrypted 256-bit SSL Secure Checkout
             </p>
           </div>
         </div>

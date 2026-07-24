@@ -54,9 +54,13 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      await login(formData.email, formData.password);
+      const data = await login(formData.email, formData.password);
       toast.success('Login successful! Welcome back.');
-      navigate('/', { replace: true });
+      if (data?.user?.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (error) {
       const message =
         error.response?.data?.message || 'Login failed. Please try again.';

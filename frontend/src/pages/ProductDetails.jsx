@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiAlertTriangle, FiShoppingBag, FiArrowLeft, FiShoppingCart, FiRefreshCw, FiHeart } from 'react-icons/fi';
 import api from '../api/axios';
-import { PRODUCT_ENDPOINTS, WISHLIST_ENDPOINTS } from '../constants';
+import { PRODUCT_ENDPOINTS } from '../constants';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
+import { formatCurrency } from '../utils/formatCurrency';
 import ProductGallery from '../components/product/ProductGallery';
 import QuantitySelector from '../components/product/QuantitySelector';
 import RelatedProducts from '../components/product/RelatedProducts';
@@ -14,6 +16,7 @@ function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isWishlisted } = useWishlist();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,19 +66,17 @@ function ProductDetails() {
     }
   };
 
-  const handleAddToWishlist = async () => {
+  const handleToggleWishlist = async () => {
+    if (!product) return;
     setIsAddingWishlist(true);
     try {
-      await api.post(WISHLIST_ENDPOINTS.ADD, { productId: product._id });
-      toast.success(`${name} added to wishlist!`);
-    } catch (err) {
-      console.error('Error adding to wishlist:', err);
-      const msg = err.response?.data?.message || 'Failed to add item to wishlist. Please try again.';
-      if (msg.toLowerCase().includes('already in wishlist') || msg === 'Product already exists in wishlist') {
-        toast.warning(msg);
+      if (isWishlisted(product._id)) {
+        await removeFromWishlist(product._id);
       } else {
-        toast.error(msg);
+        await addToWishlist(product._id);
       }
+    } catch (err) {
+      console.error('Error toggling wishlist:', err);
     } finally {
       setIsAddingWishlist(false);
     }
@@ -143,6 +144,7 @@ function ProductDetails() {
 
   const { name, brand, category, description, price, stock, images } = product;
   const isOutOfStock = stock <= 0;
+  const inWishlist = isWishlisted(product._id);
 
   return (
     <div className="container product-details-page">
@@ -157,24 +159,25 @@ function ProductDetails() {
 
       {/* Main product view block */}
       <div className="product-details-container">
-        {/* Left Column: Image display */}
-        <ProductGallery images={images} />
+        {/* Left side: Images */}
+        <div className="product-details-left">
+          <ProductGallery images={images} productName={name} />
+        </div>
 
-        {/* Right Column: Info block */}
-        <div className="product-details-info">
-          <div className="product-details-meta">
+        {/* Right side: Product info & Actions */}
+        <div className="product-details-right">
+          <div className="product-details-header">
             <span className="product-details-category">{category}</span>
             <span className="product-details-brand">{brand}</span>
           </div>
 
-          <h1 className="product-details-name">{name}</h1>
+          <h1 className="product-details-title">{name}</h1>
 
-          {/* Pricing & Stock status */}
-          <div className="product-details-price-stock">
-            <span className="product-details-price">${price.toFixed(2)}</span>
+          <div className="product-details-price-row">
+            <span className="product-details-price">{formatCurrency(price)}</span>
             <span
-              className={`product-details-badge ${
-                isOutOfStock ? 'product-details-badge-outofstock' : 'product-details-badge-instock'
+              className={`product-details-stock-badge ${
+                isOutOfStock ? 'badge-outofstock' : 'badge-instock'
               }`}
             >
               {isOutOfStock ? 'Out of Stock' : 'In Stock'}
@@ -218,12 +221,13 @@ function ProductDetails() {
                 <FiShoppingBag size={18} /> Buy Now
               </button>
               <button
-                className="product-details-btn product-details-btn-secondary"
+                className={`product-details-btn product-details-btn-secondary ${inWishlist ? 'product-details-btn-wishlisted' : ''}`}
                 disabled={isAddingWishlist}
-                onClick={handleAddToWishlist}
+                onClick={handleToggleWishlist}
                 aria-label="Add product to wishlist"
               >
-                <FiHeart size={18} /> {isAddingWishlist ? 'Adding...' : 'Add to Wishlist'}
+                <FiHeart size={18} fill={inWishlist ? 'currentColor' : 'none'} style={{ color: inWishlist ? 'var(--color-error, #ef4444)' : 'inherit' }} />
+                {isAddingWishlist ? 'Updating...' : inWishlist ? 'Wishlisted' : 'Add to Wishlist'}
               </button>
             </div>
           </div>

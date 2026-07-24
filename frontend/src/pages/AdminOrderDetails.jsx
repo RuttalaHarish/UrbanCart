@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { ORDER_STATUSES, PAYMENT_STATUSES, ORDER_ENDPOINTS } from '../constants';
 import { Loading } from '../components/common';
+import { formatCurrency } from '../utils/formatCurrency';
 import '../styles/AdminOrderDetails.css';
 
 function AdminOrderDetails() {
@@ -142,7 +143,7 @@ function AdminOrderDetails() {
                       <span className="admin-item-name">{name}</span>
                       <span className="admin-item-qty">Quantity: {item.quantity}</span>
                     </div>
-                    <span className="admin-item-price">₹{price * item.quantity}</span>
+                    <span className="admin-item-price">{formatCurrency(price * item.quantity)}</span>
                   </div>
                 );
               })}
@@ -151,7 +152,7 @@ function AdminOrderDetails() {
             {/* Financial summary */}
             <div className="admin-details-financials">
               <span>Total</span>
-              <span>₹{order.totalAmount}</span>
+              <span>{formatCurrency(order.totalAmount)}</span>
             </div>
           </div>
         </div>

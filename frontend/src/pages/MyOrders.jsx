@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiPackage, FiCalendar, FiArrowLeft, FiImage } from 'react-icons/fi';
 import api from '../api/axios';
 import { ORDER_ENDPOINTS } from '../constants';
+import { formatCurrency } from '../utils/formatCurrency';
 import './MyOrders.css';
 
 function MyOrders() {
@@ -138,7 +139,7 @@ function MyOrders() {
                   <div className="order-meta-item">
                     <span className="order-meta-label">Total Amount</span>
                     <span className="order-meta-value" style={{ fontWeight: 'bold' }}>
-                      ${order.totalAmount.toFixed(2)}
+                      {formatCurrency(order.totalAmount)}
                     </span>
                   </div>
                 </div>
@@ -185,10 +186,10 @@ function MyOrders() {
                       {/* Price and quantity breakdown */}
                       <div className="order-item-price-qty">
                         <span className="order-item-subtotal">
-                          ${(item.priceAtPurchase * item.quantity).toFixed(2)}
+                          {formatCurrency(item.priceAtPurchase * item.quantity)}
                         </span>
                         <span className="order-item-qty">
-                          ${item.priceAtPurchase.toFixed(2)} × {item.quantity}
+                          {formatCurrency(item.priceAtPurchase)} × {item.quantity}
                         </span>
                       </div>
                     </div>

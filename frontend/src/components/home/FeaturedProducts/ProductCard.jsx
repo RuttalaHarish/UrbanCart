@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiImage, FiShoppingCart, FiEye } from 'react-icons/fi';
 import { useCart } from '../../../context/CartContext';
+import { formatCurrency } from '../../../utils/formatCurrency';
 import './ProductCard.css';
 
 function ProductCard({ product }) {
@@ -62,7 +63,7 @@ function ProductCard({ product }) {
         <h3 className="product-card-name" title={name}>
           {name}
         </h3>
-        <div className="product-card-price">${price.toFixed(2)}</div>
+        <div className="product-card-price">{formatCurrency(price)}</div>
 
         {/* Action Buttons */}
         <div className="product-card-actions">

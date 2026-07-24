@@ -5,6 +5,8 @@ const {
   getOrderById,
   getAllOrders,
   updateOrderStatus,
+  cancelOrder,
+  deleteOrder,
   getDashboardStats,
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
@@ -24,8 +26,12 @@ router.get('/all', admin, getAllOrders);
 // Admin-only route to get dashboard statistics (Must be before /:id)
 router.get('/dashboard/stats', admin, getDashboardStats);
 
+// Customer-accessible order cancellation route
+router.put('/:id/cancel', cancelOrder);
+
 router.route('/:id')
-  .get(getOrderById);
+  .get(getOrderById)
+  .delete(admin, deleteOrder);
 
 // Admin-only route to update status
 router.put('/:id/status', admin, updateOrderStatus);

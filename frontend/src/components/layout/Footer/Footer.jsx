@@ -3,9 +3,6 @@ import {
   FiTwitter,
   FiInstagram,
   FiFacebook,
-  FiMail,
-  FiPhone,
-  FiMapPin,
 } from 'react-icons/fi';
 import './Footer.css';
 
@@ -33,7 +30,7 @@ function Footer() {
   return (
     <footer className="footer-shell">
       <div className="container">
-        {/* Footer Top Grid — 4 Columns */}
+        {/* Footer Top Grid — 3 Columns */}
         <div className="footer-grid--extended">
           {/* Column 1: Brand */}
           <div className="footer-brand">
@@ -96,28 +93,6 @@ function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Column 4: Newsletter */}
-          <div className="footer-newsletter">
-            <h4 className="footer-newsletter__title">Newsletter</h4>
-            <p className="footer-newsletter__text">
-              Subscribe to get updates on new arrivals and exclusive offers.
-            </p>
-            <form
-              className="footer-newsletter__form"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <input
-                type="email"
-                className="footer-newsletter__input"
-                placeholder="Enter your email"
-                aria-label="Email for newsletter"
-              />
-              <button type="submit" className="footer-newsletter__btn">
-                Subscribe
-              </button>
-            </form>
           </div>
         </div>
 

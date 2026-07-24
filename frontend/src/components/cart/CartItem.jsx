@@ -1,5 +1,6 @@
 import { FiImage, FiTrash2 } from 'react-icons/fi';
 import QuantitySelector from '../product/QuantitySelector';
+import { formatCurrency } from '../../utils/formatCurrency';
 import './CartItem.css';
 
 function CartItem({ item, onUpdateQuantity, onRemove }) {
@@ -31,7 +32,7 @@ function CartItem({ item, onUpdateQuantity, onRemove }) {
       </div>
 
       {/* Single Price */}
-      <div className="cart-item-price">${price.toFixed(2)}</div>
+      <div className="cart-item-price">{formatCurrency(price)}</div>
 
       {/* Quantity Adjuster */}
       <div>
@@ -43,7 +44,7 @@ function CartItem({ item, onUpdateQuantity, onRemove }) {
       </div>
 
       {/* Subtotal */}
-      <div className="cart-item-subtotal">${subtotal.toFixed(2)}</div>
+      <div className="cart-item-subtotal">{formatCurrency(subtotal)}</div>
 
       {/* Remove Button */}
       <button

@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
+import AdminLayout from '../layouts/AdminLayout';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -16,6 +17,7 @@ import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
 import MyOrders from '../pages/MyOrders';
 import OrderDetails from '../pages/OrderDetails';
+import Profile from '../pages/Profile';
 import AdminDashboard from '../pages/AdminDashboard';
 import AdminOrders from '../pages/AdminOrders';
 import AdminOrderDetails from '../pages/AdminOrderDetails';
@@ -29,7 +31,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Pages WITH MainLayout (Navbar + Footer) */}
+      {/* Customer Pages WITH MainLayout (Navbar + Footer) */}
       <Route element={<MainLayout />}>
         {/* Public */}
         <Route path="/" element={<Home />} />
@@ -44,12 +46,18 @@ const AppRoutes = () => {
 
         {/* Protected Routes (authenticated users) */}
         <Route element={<ProtectedRoute />}>
+          <Route path="/profile" element={<Profile />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
         </Route>
 
-        {/* Admin Routes (admin role only) */}
-        <Route element={<AdminRoute />}>
+        {/* 404 inside layout */}
+        <Route path="*" element={<NotFound />} />
+      </Route>
+
+      {/* Admin Routes (wrapped in AdminRoute + AdminLayout) */}
+      <Route element={<AdminRoute />}>
+        <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
@@ -57,14 +65,9 @@ const AppRoutes = () => {
           <Route path="/admin/products/add" element={<AdminAddProduct />} />
           <Route path="/admin/products/:id/edit" element={<AdminAddProduct />} />
         </Route>
-
-        {/* 404 inside layout */}
-        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
 };
 
 export default AppRoutes;
-
-

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FiArrowLeft, FiPackage, FiMapPin, FiCreditCard, FiAlertTriangle, FiImage, FiCalendar, FiUser, FiPhone } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import { FiArrowLeft, FiPackage, FiMapPin, FiCreditCard, FiAlertTriangle, FiImage, FiCalendar, FiUser, FiPhone, FiXCircle } from 'react-icons/fi';
 import api from '../api/axios';
 import { ORDER_ENDPOINTS } from '../constants';
+import { formatCurrency } from '../utils/formatCurrency';
 import './OrderDetails.css';
 
 function OrderDetails() {
@@ -10,6 +12,8 @@ function OrderDetails() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const fetchOrderDetails = async () => {
     setLoading(true);
@@ -37,6 +41,25 @@ function OrderDetails() {
   useEffect(() => {
     fetchOrderDetails();
   }, [id]);
+
+  const handleConfirmCancel = async () => {
+    setCancelling(true);
+    try {
+      const response = await api.put(ORDER_ENDPOINTS.CANCEL(id));
+      if (response.data?.success && response.data?.data) {
+        setOrder(response.data.data);
+        toast.success(response.data.message || 'Order cancelled successfully');
+        setShowCancelModal(false);
+      } else {
+        toast.error(response.data?.message || 'Failed to cancel order');
+      }
+    } catch (err) {
+      console.error('Cancel order error:', err);
+      toast.error(err.response?.data?.message || 'Failed to cancel order');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   /* ─── Loading Skeleton ─── */
   if (loading) {
@@ -114,7 +137,7 @@ function OrderDetails() {
           </span>
         </div>
 
-        <div className="order-status-wrapper">
+        <div className="order-status-wrapper" style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)', flexWrap: 'wrap' }}>
           {/* Order Status Badge */}
           <span className={`badge badge-order-${order.orderStatus.toLowerCase()}`} style={{ fontSize: '1rem', padding: 'var(--spacing-xs) var(--spacing-md)' }}>
             {order.orderStatus}
@@ -123,6 +146,18 @@ function OrderDetails() {
           <span className={`badge badge-payment-${order.paymentStatus.toLowerCase()}`} style={{ fontSize: '1rem', padding: 'var(--spacing-xs) var(--spacing-md)' }}>
             Payment: {order.paymentStatus}
           </span>
+
+          {/* Cancel Order Action Button (Visible ONLY when orderStatus is Pending) */}
+          {order.orderStatus === 'Pending' && (
+            <button
+              type="button"
+              className="admin-action-btn admin-action-btn--danger"
+              style={{ padding: '8px 16px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              onClick={() => setShowCancelModal(true)}
+            >
+              <FiXCircle size={16} /> Cancel Order
+            </button>
+          )}
         </div>
       </div>
 
@@ -164,10 +199,10 @@ function OrderDetails() {
                     {/* Pricing breakdown */}
                     <div className="order-item-price-qty">
                       <span className="order-item-subtotal">
-                        ${(item.priceAtPurchase * item.quantity).toFixed(2)}
+                        {formatCurrency(item.priceAtPurchase * item.quantity)}
                       </span>
                       <span className="order-item-qty">
-                        ${item.priceAtPurchase.toFixed(2)} × {item.quantity}
+                        {formatCurrency(item.priceAtPurchase)} × {item.quantity}
                       </span>
                     </div>
                   </div>
@@ -179,7 +214,7 @@ function OrderDetails() {
             <div className="order-financials">
               <div className="financial-row">
                 <span>Subtotal</span>
-                <span>${order.totalAmount.toFixed(2)}</span>
+                <span>{formatCurrency(order.totalAmount)}</span>
               </div>
               <div className="financial-row">
                 <span>Shipping</span>
@@ -187,7 +222,7 @@ function OrderDetails() {
               </div>
               <div className="financial-row financial-row--total">
                 <span>Total Amount</span>
-                <span>${order.totalAmount.toFixed(2)}</span>
+                <span>{formatCurrency(order.totalAmount)}</span>
               </div>
             </div>
           </div>
@@ -257,6 +292,36 @@ function OrderDetails() {
           </div>
         </div>
       </div>
+
+      {/* Cancel Order Confirmation Modal */}
+      {showCancelModal && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal-content">
+            <h3 className="admin-modal-title">Cancel Order</h3>
+            <p className="admin-modal-message">
+              Are you sure you want to cancel this order?
+            </p>
+            <div className="admin-modal-actions">
+              <button
+                type="button"
+                className="admin-modal-btn admin-modal-btn--cancel"
+                onClick={() => setShowCancelModal(false)}
+                disabled={cancelling}
+              >
+                No, Keep Order
+              </button>
+              <button
+                type="button"
+                className="admin-modal-btn admin-modal-btn--delete"
+                onClick={handleConfirmCancel}
+                disabled={cancelling}
+              >
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel Order'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

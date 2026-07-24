@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FiMail, FiPhone, FiMapPin, FiClock, FiSend, FiMap } from 'react-icons/fi';
+import { SHIPPING_THRESHOLD } from '../constants';
+import { formatCurrency } from '../utils/formatCurrency';
 import './Contact.css';
 
 function Contact() {
@@ -193,7 +195,7 @@ function Contact() {
           <div className="contact-faq-card">
             <h3 className="contact-faq-question">Do you offer free delivery?</h3>
             <p className="contact-faq-answer">
-              Yes, free standard shipping is automatically applied to orders over $150.
+              Yes, free standard shipping is automatically applied to orders over {formatCurrency(SHIPPING_THRESHOLD)}.
             </p>
           </div>
           <div className="contact-faq-card">

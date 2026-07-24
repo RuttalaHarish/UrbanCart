@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiInfo, FiDollarSign, FiArchive, FiTag, FiImage, FiArrowLeft, FiPlus, FiTrash2, FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
+import { FiInfo, FiArchive, FiTag, FiImage, FiArrowLeft, FiPlus, FiTrash2, FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { CATEGORY_ENDPOINTS, PRODUCT_ENDPOINTS } from '../constants';
@@ -408,7 +408,7 @@ function AdminAddProduct() {
             {/* Pricing */}
             <div className="admin-form-group">
               <h2 className="admin-form-section-title" style={{ marginBottom: '12px' }}>
-                <FiDollarSign size={18} /> Pricing
+                <FiTag size={18} /> Pricing
               </h2>
               <label className="admin-form-label" htmlFor="price">Price (₹)</label>
               <input

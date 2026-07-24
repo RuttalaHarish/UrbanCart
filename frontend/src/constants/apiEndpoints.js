@@ -7,6 +7,10 @@ export const AUTH_ENDPOINTS = {
   REGISTER: '/auth/register',
 };
 
+export const USER_ENDPOINTS = {
+  PROFILE: '/users/profile',
+};
+
 export const PRODUCT_ENDPOINTS = {
   LIST: '/products',
   CREATE: '/products',
@@ -38,5 +42,14 @@ export const ORDER_ENDPOINTS = {
   ALL: '/orders/all',
   DETAILS: (id) => `/orders/${id}`,
   UPDATE_STATUS: (id) => `/orders/${id}/status`,
+  CANCEL: (id) => `/orders/${id}/cancel`,
+  DELETE: (id) => `/orders/${id}`,
   DASHBOARD_STATS: '/orders/dashboard/stats',
+  RAZORPAY_CREATE: '/orders/razorpay',
+  RAZORPAY_VERIFY: '/orders/verify',
+};
+
+export const PAYMENT_ENDPOINTS = {
+  CREATE_ORDER: '/orders/razorpay',
+  VERIFY: '/orders/verify',
 };

@@ -1,6 +1,6 @@
 /*
  * UrbanCart — Featured Products Container Styles
- * Handles responsive grid columns, animations, loaders, error messages, and spacing.
+ * Handles responsive grid columns, animations, skeleton loaders, error messages, and spacing.
  */
 
 .featured-products {
@@ -53,30 +53,72 @@
   width: 100%;
 }
 
-/* ===== Loading State ===== */
-.featured-products-loader {
+/* ===== Skeleton Loading State ===== */
+.product-card-skeleton {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 250px;
-  gap: var(--spacing-md);
-  color: var(--color-text-secondary);
+  height: 360px;
+  box-shadow: var(--shadow-sm);
 }
 
-.featured-products-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-primary);
-  border-radius: var(--radius-full);
-  animation: prodSpinnerRotate 0.8s linear infinite;
+.skeleton-media {
+  width: 100%;
+  height: 180px;
+  background-color: var(--color-border);
+  animation: skeletonPulse 1.5s infinite ease-in-out;
 }
 
-@keyframes prodSpinnerRotate {
-  to {
-    transform: rotate(360deg);
-  }
+.skeleton-body {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.skeleton-badge-line {
+  width: 45%;
+  height: 14px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-sm);
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-title {
+  width: 85%;
+  height: 20px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-price {
+  width: 35%;
+  height: 18px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-actions {
+  width: 100%;
+  height: 36px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-md);
+  margin-top: auto;
+  animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.25; }
+  100% { opacity: 0.6; }
 }
 
 /* ===== Info Message Boxes (Error, Empty) ===== */
