@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { FiAlertTriangle, FiShoppingBag, FiArrowLeft, FiShoppingCart, FiRefreshCw, FiHeart } from 'react-icons/fi';
 import api from '../api/axios';
 import { PRODUCT_ENDPOINTS } from '../constants';
+import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { formatCurrency } from '../utils/formatCurrency';
@@ -49,24 +50,34 @@ function ProductDetails() {
     }
   };
 
+  const { isAuthenticated } = useAuth();
+
   const handleAddToCart = async (redirectToCart = false) => {
+    if (!isAuthenticated) {
+      toast.info('Please login to continue');
+      navigate('/login');
+      return;
+    }
     setIsAdding(true);
     try {
       await addToCart(product._id, quantity);
-      toast.success(`${name} added to cart!`);
+      toast.success(`${product?.name || 'Item'} added to cart!`);
       if (redirectToCart) {
         navigate('/cart');
       }
     } catch (err) {
       console.error('Error adding to cart:', err);
-      const msg = err.response?.data?.message || 'Failed to add item to cart. Please try again.';
-      toast.error(msg);
     } finally {
       setIsAdding(false);
     }
   };
 
   const handleToggleWishlist = async () => {
+    if (!isAuthenticated) {
+      toast.info('Please login to add items to wishlist');
+      navigate('/login');
+      return;
+    }
     if (!product) return;
     setIsAddingWishlist(true);
     try {

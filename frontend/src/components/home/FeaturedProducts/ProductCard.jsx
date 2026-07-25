@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiImage, FiShoppingCart, FiEye } from 'react-icons/fi';
 import { useCart } from '../../../context/CartContext';
+import { useAuth } from '../../../context/AuthContext';
 import { formatCurrency } from '../../../utils/formatCurrency';
 import './ProductCard.css';
 
@@ -11,16 +12,22 @@ function ProductCard({ product }) {
   const isOutOfStock = stock === 0;
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast.info('Please login to add items to cart');
+      navigate('/login');
+      return;
+    }
+
     setIsAdding(true);
     try {
       await addToCart(_id, 1);
       toast.success(`${name} added to cart!`);
     } catch (err) {
       console.error('Error adding to cart:', err);
-      const msg = err.response?.data?.message || 'Failed to add item to cart. Please try again.';
-      toast.error(msg);
     } finally {
       setIsAdding(false);
     }

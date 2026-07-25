@@ -8,11 +8,8 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-/* ─── Request interceptor ───────────────────────────────────────────
-   Reads the token from localStorage synchronously before every
-   request. This guarantees the Authorization header is present even
-   when a request fires before AuthContext's useEffect has had a
-   chance to call api.defaults.headers.common['Authorization'] = ...
+/* ─── Request Interceptor ───────────────────────────────────────────
+   Reads the token from localStorage synchronously before every request.
 ─────────────────────────────────────────────────────────────────── */
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -25,5 +22,25 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export default axiosInstance;
+/* ─── Response Interceptor ──────────────────────────────────────────
+   Handles 401 Unauthorized errors by redirecting unauthenticated users
+   straight to /login without displaying raw "no authentication" popups.
+─────────────────────────────────────────────────────────────────── */
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Clear invalid credentials
+      localStorage.removeItem('urbancart_token');
+      localStorage.removeItem('urbancart_user');
+      
+      // Redirect to login if not already on /login
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
+export default axiosInstance;

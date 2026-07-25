@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { CART_ENDPOINTS } from '../constants';
 import { useAuth } from './AuthContext';
@@ -60,13 +61,20 @@ export const CartProvider = ({ children }) => {
      Backend returns updated cart document
   ───────────────────────────────────── */
   const addToCart = useCallback(async (productId, quantity = 1) => {
+    if (!isAuthenticated) {
+      toast.info('Please login to add items to cart');
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+      return;
+    }
     const response = await api.post(CART_ENDPOINTS.ADD, { productId, quantity });
     if (response.data?.data) {
       const rawItems = response.data.data.items || [];
       const validItems = normalizeCartItems(rawItems);
       setCartItems(validItems);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   /* ─────────────────────────────────────
      removeFromCart

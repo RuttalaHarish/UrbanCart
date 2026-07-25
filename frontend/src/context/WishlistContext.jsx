@@ -78,6 +78,13 @@ export const WishlistProvider = ({ children }) => {
      POST /api/wishlist  { productId }
   ───────────────────────────────────── */
   const addToWishlist = useCallback(async (productId) => {
+    if (!isAuthenticated) {
+      toast.info('Please login to add items to wishlist');
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+      return;
+    }
     try {
       const response = await api.post(WISHLIST_ENDPOINTS.ADD, { productId });
       if (response.data?.data) {
