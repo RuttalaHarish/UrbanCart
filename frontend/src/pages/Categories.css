@@ -1,4 +1,4 @@
-/* Flipkart-Style Mobile Split-Pane Categories CSS */
+/* Flipkart-Style Mobile Categories CSS (Clean & Category-Separated) */
 
 .fk-categories-wrapper {
   width: 100%;
@@ -73,120 +73,56 @@
   font-weight: 700;
 }
 
-/* ===== Right Main Content Area ===== */
+/* ===== Right Main Content Area (Separated Category-Wise) ===== */
 .fk-cat-main-content {
   flex: 1;
   padding: 12px 14px 24px 14px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   overflow-y: auto;
   box-sizing: border-box;
 }
 
-/* Active Category Hero Promo Banner */
-.fk-cat-hero-banner {
+.fk-cat-separated-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fk-cat-group-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fk-cat-group-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  padding: 14px 16px;
-  border-radius: 14px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 6px;
 }
 
-.fk-cat-hero-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.fk-cat-hero-title {
-  font-size: 1.1rem;
+.fk-cat-group-title {
+  font-size: 14px;
   font-weight: 800;
-  color: #1e3a8a;
+  color: #0f172a;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.fk-cat-hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
+.fk-cat-group-count {
+  font-size: 11px;
   font-weight: 700;
   color: #2563eb;
+  background-color: #dbeafe;
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
-.fk-cat-hero-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* In the Spotlight Grid */
-.fk-spotlight-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.fk-spotlight-heading {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 4px 0;
-}
-
-.fk-spotlight-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.fk-spotlight-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.fk-spotlight-icon-box {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.fk-spotlight-tag {
-  font-size: 10px;
-  font-weight: 700;
-  color: #1e293b;
-  text-align: center;
-}
-
-.fk-spotlight-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #334155;
-  text-align: center;
-}
-
-/* Category Products Grid Section */
-.fk-cat-products-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
+/* Products 2-Column Responsive Grid */
 .fk-cat-products-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

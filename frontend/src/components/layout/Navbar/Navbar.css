@@ -193,10 +193,12 @@
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .navbar-header {
-    position: relative !important; /* Top logo bar scrolls away naturally */
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
     background-color: #2874f0 !important; /* Flipkart Primary Blue */
     color: #ffffff;
-    box-shadow: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     width: 100%;
     box-sizing: border-box;
   }
@@ -231,18 +233,14 @@
     display: none;
   }
 
-  /* Mobile Search Bar Row (ONLY Search Bar is Sticky at top=0 on scroll) */
+  /* Mobile Search Bar Row */
   .mobile-search-bar-row {
     display: flex;
     align-items: center;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1000 !important;
-    background-color: #2874f0 !important;
-    padding: 8px 16px 12px 16px;
+    position: relative;
+    padding: 0 16px 12px 16px;
     width: 100%;
     box-sizing: border-box;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   }
 
   .mobile-search-bar-input {
