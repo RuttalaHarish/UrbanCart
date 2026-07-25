@@ -185,10 +185,9 @@
   display: none;
 }
 
-/* ===== Active Nav Link ===== */
-.navbar-link-item a.active {
-  color: var(--color-primary);
-  font-weight: var(--font-weight-semibold);
+/* Mobile Search Bar Row (Hidden on Desktop, Visible on Mobile <= 768px) */
+.mobile-search-bar-row {
+  display: none;
 }
 
 /* ===== Responsive ===== */
