@@ -11,9 +11,12 @@ import {
   FiLogIn,
   FiPackage,
 } from 'react-icons/fi';
+import api from '../../../api/axios';
+import { PRODUCT_ENDPOINTS } from '../../../constants';
 import { useAuth } from '../../../context/AuthContext';
 import { useCart } from '../../../context/CartContext';
 import { useWishlist } from '../../../context/WishlistContext';
+import { formatCurrency } from '../../../utils/formatCurrency';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -39,13 +42,56 @@ function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const profileRef = useRef(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  // Close profile dropdown on outside click
+  const profileRef = useRef(null);
+  const desktopSearchRef = useRef(null);
+  const mobileSearchRef = useRef(null);
+
+  // Live autocomplete search effect with debouncing
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const response = await api.get(`${PRODUCT_ENDPOINTS.LIST}?q=${encodeURIComponent(q)}&limit=6`);
+        const items = Array.isArray(response.data)
+          ? response.data
+          : response.data?.data || response.data?.products || [];
+        setSearchResults(items);
+        setShowDropdown(true);
+      } catch (err) {
+        console.error('Live search error:', err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Close profile and search dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setProfileOpen(false);
+      }
+      if (
+        desktopSearchRef.current &&
+        !desktopSearchRef.current.contains(e.target) &&
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(e.target)
+      ) {
+        setShowDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -68,6 +114,7 @@ function Navbar() {
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       const q = searchQuery.trim();
+      setShowDropdown(false);
       if (q) {
         navigate(`/shop?q=${encodeURIComponent(q)}`);
       } else {
@@ -75,6 +122,44 @@ function Navbar() {
       }
       setMobileOpen(false);
     }
+  };
+
+  const renderSearchDropdown = () => {
+    if (!showDropdown || !searchQuery.trim()) return null;
+
+    return (
+      <div className="navbar-search-dropdown">
+        {isSearching ? (
+          <div className="search-dropdown-loading">Searching items...</div>
+        ) : searchResults.length > 0 ? (
+          searchResults.map((product) => (
+            <div
+              key={product._id}
+              className="search-dropdown-item"
+              onClick={() => {
+                setShowDropdown(false);
+                setSearchQuery('');
+                navigate(`/products/${product._id}`);
+              }}
+            >
+              <img
+                src={product.images?.[0] || 'https://via.placeholder.com/40'}
+                alt={product.name}
+                className="search-dropdown-img"
+              />
+              <div className="search-dropdown-info">
+                <span className="search-dropdown-name">{product.name}</span>
+                <span className="search-dropdown-meta">
+                  {product.category} • {formatCurrency(product.price)}
+                </span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="search-dropdown-empty">No products found matching "{searchQuery}"</div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -101,8 +186,8 @@ function Navbar() {
           </ul>
         </nav>
 
-        {/* Desktop Search */}
-        <div className="navbar-search">
+        {/* Desktop Search Box with Live Dropdown */}
+        <div className="navbar-search" ref={desktopSearchRef}>
           <span className="navbar-search__icon">
             <FiSearch size={14} />
           </span>
@@ -113,8 +198,10 @@ function Navbar() {
             aria-label="Search products"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => searchQuery.trim() && setShowDropdown(true)}
             onKeyDown={handleSearch}
           />
+          {renderSearchDropdown()}
         </div>
 
         {/* Action Buttons */}
@@ -191,8 +278,8 @@ function Navbar() {
         </div>
       </div>
 
-      {/* ===== Mobile Direct Search Bar Row ===== */}
-      <div className="mobile-search-bar-row">
+      {/* ===== Mobile Direct Search Bar Row with Live Dropdown ===== */}
+      <div className="mobile-search-bar-row" ref={mobileSearchRef}>
         <span className="mobile-search-icon-wrapper">
           <FiSearch size={15} />
         </span>
@@ -203,11 +290,13 @@ function Navbar() {
           aria-label="Search products"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onFocus={() => searchQuery.trim() && setShowDropdown(true)}
           onKeyDown={handleSearch}
         />
+        {renderSearchDropdown()}
       </div>
 
-      {/* ===== Mobile Menu ===== */}
+      {/* ===== Mobile Menu Drawer ===== */}
       <div
         className={`mobile-nav-overlay ${mobileOpen ? 'mobile-nav-overlay--open' : ''}`}
         onClick={() => setMobileOpen(false)}
@@ -221,7 +310,7 @@ function Navbar() {
           <FiX size={22} />
         </button>
 
-        {/* Mobile Search */}
+        {/* Mobile Search inside Menu */}
         <div className="mobile-nav-menu__search">
           <span className="navbar-search__icon">
             <FiSearch size={14} />

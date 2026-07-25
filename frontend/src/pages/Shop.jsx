@@ -219,19 +219,6 @@ function Shop() {
 
   return (
     <div className="container shop-page">
-      {/* Page Header */}
-      <div className="shop-header">
-        <span className="shop-title-badge">
-          {query ? `Results for "${query}"` : 'All Products'}
-        </span>
-        <h1 className="shop-title">Shop Our Collection</h1>
-        <p className="shop-subtitle">
-          {query
-            ? `Showing products matching "${query}"`
-            : 'Discover a wide range of premium products selected for your convenience.'}
-        </p>
-      </div>
-
       {/* Filter Toolbar UI */}
       <div className="shop-toolbar">
         <div className="shop-search-wrapper">
