@@ -5,7 +5,6 @@ import {
   FiShoppingBag,
   FiHeart,
   FiShoppingCart,
-  FiUser,
 } from 'react-icons/fi';
 import { useCart } from '../../../context/CartContext';
 import { useWishlist } from '../../../context/WishlistContext';
@@ -17,17 +16,16 @@ function BottomNav() {
   const { wishlistCount } = useWishlist();
   const { isAuthenticated, user } = useAuth();
 
-  const profilePath = isAuthenticated
-    ? user?.role === 'admin'
-      ? '/admin/dashboard'
-      : '/profile'
-    : '/login';
+  const handleNavClick = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  };
 
   return (
     <nav className="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
       <NavLink
         to="/"
         end
+        onClick={handleNavClick}
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
         }
@@ -38,6 +36,7 @@ function BottomNav() {
 
       <NavLink
         to="/categories"
+        onClick={handleNavClick}
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
         }
@@ -48,6 +47,7 @@ function BottomNav() {
 
       <NavLink
         to="/shop"
+        onClick={handleNavClick}
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
         }
@@ -58,6 +58,7 @@ function BottomNav() {
 
       <NavLink
         to="/wishlist"
+        onClick={handleNavClick}
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
         }
@@ -73,6 +74,7 @@ function BottomNav() {
 
       <NavLink
         to="/cart"
+        onClick={handleNavClick}
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
         }
