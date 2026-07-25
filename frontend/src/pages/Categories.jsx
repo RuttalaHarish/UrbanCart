@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   FiGrid,
   FiShoppingBag,
@@ -10,6 +10,7 @@ import {
   FiBook,
   FiShoppingCart,
   FiHome,
+  FiPackage,
   FiInbox,
   FiAlertTriangle,
   FiRefreshCw,
@@ -19,17 +20,29 @@ import { PRODUCT_ENDPOINTS } from '../constants';
 import ProductCard from '../components/home/FeaturedProducts/ProductCard';
 import './Categories.css';
 
-const CATEGORY_SIDEBAR = [
-  { id: 'all', label: 'For You', icon: FiGrid, color: '#9333ea', bg: '#f3e8ff' },
-  { id: 'fashion', label: 'Fashion', icon: FiShoppingBag, color: '#2563eb', bg: '#dbeafe' },
-  { id: 'mobiles', label: 'Mobiles', icon: FiSmartphone, color: '#059669', bg: '#d1fae5' },
-  { id: 'appliances', label: 'Appliances', icon: FiTv, color: '#dc2626', bg: '#fee2e2' },
-  { id: 'electronics', label: 'Electronics', icon: FiMonitor, color: '#d97706', bg: '#fef3c7' },
-  { id: 'beauty', label: 'Beauty', icon: FiSmile, color: '#db2777', bg: '#fce7f3' },
-  { id: 'books', label: 'Books', icon: FiBook, color: '#4f46e5', bg: '#e0e7ff' },
-  { id: 'sports', label: 'Sports', icon: FiActivity, color: '#0284c7', bg: '#e0f2fe' },
-  { id: 'groceries', label: 'Groceries', icon: FiShoppingCart, color: '#16a34a', bg: '#dcfce7' },
-  { id: 'home & kitchen', label: 'Home & Kitchen', icon: FiHome, color: '#ca8a04', bg: '#fef9c3' },
+// Preset Category Visual Style Mapping
+const CATEGORY_STYLE_MAP = {
+  'electronics': { icon: FiMonitor, color: '#d97706', bg: '#fef3c7' },
+  'fashion': { icon: FiShoppingBag, color: '#2563eb', bg: '#dbeafe' },
+  'mobiles': { icon: FiSmartphone, color: '#059669', bg: '#d1fae5' },
+  'appliances': { icon: FiTv, color: '#dc2626', bg: '#fee2e2' },
+  'beauty': { icon: FiSmile, color: '#db2777', bg: '#fce7f3' },
+  'books': { icon: FiBook, color: '#4f46e5', bg: '#e0e7ff' },
+  'sports': { icon: FiActivity, color: '#0284c7', bg: '#e0f2fe' },
+  'groceries': { icon: FiShoppingCart, color: '#16a34a', bg: '#dcfce7' },
+  'home & kitchen': { icon: FiHome, color: '#ca8a04', bg: '#fef9c3' },
+};
+
+const COLOR_PALETTE = [
+  { color: '#2563eb', bg: '#dbeafe' },
+  { color: '#059669', bg: '#d1fae5' },
+  { color: '#dc2626', bg: '#fee2e2' },
+  { color: '#d97706', bg: '#fef3c7' },
+  { color: '#db2777', bg: '#fce7f3' },
+  { color: '#4f46e5', bg: '#e0e7ff' },
+  { color: '#0284c7', bg: '#e0f2fe' },
+  { color: '#16a34a', bg: '#dcfce7' },
+  { color: '#ca8a04', bg: '#fef9c3' },
 ];
 
 function Categories() {
@@ -60,50 +73,84 @@ function Categories() {
     fetchProducts();
   }, []);
 
-  // Group products category-wise
-  const groupedProducts = allProducts.reduce((acc, prod) => {
-    const catName = (prod.category || 'Uncategorized').trim();
-    if (!acc[catName]) acc[catName] = [];
-    acc[catName].push(prod);
-    return acc;
-  }, {});
+  // 1. Group products dynamically by their exact category name from database
+  const categoryGroups = useMemo(() => {
+    const groups = {};
+    for (const prod of allProducts) {
+      const cat = (prod.category || 'Other').trim();
+      if (!groups[cat]) {
+        groups[cat] = [];
+      }
+      groups[cat].push(prod);
+    }
+    return groups;
+  }, [allProducts]);
 
-  const currentCategoryInfo = CATEGORY_SIDEBAR.find((c) => c.id === activeCat) || CATEGORY_SIDEBAR[0];
+  // 2. Extract unique available category names dynamically (ONLY categories present in shop)
+  const availableCategories = useMemo(() => {
+    return Object.keys(categoryGroups);
+  }, [categoryGroups]);
 
-  // Filter products by active category selection
-  const filteredProducts = activeCat === 'all'
-    ? allProducts
-    : allProducts.filter((p) => (p.category || '').trim().toLowerCase() === activeCat);
+  // 3. Dynamically build left sidebar list matching right-side category order exactly
+  const sidebarItems = useMemo(() => {
+    const items = [
+      {
+        id: 'all',
+        label: 'For You',
+        icon: FiGrid,
+        color: '#9333ea',
+        bg: '#f3e8ff',
+      },
+    ];
+
+    availableCategories.forEach((catName, idx) => {
+      const key = catName.toLowerCase();
+      const preset = CATEGORY_STYLE_MAP[key] || {
+        icon: FiPackage,
+        ...COLOR_PALETTE[idx % COLOR_PALETTE.length],
+      };
+
+      items.push({
+        id: catName,
+        label: catName,
+        icon: preset.icon,
+        color: preset.color,
+        bg: preset.bg,
+      });
+    });
+
+    return items;
+  }, [availableCategories]);
 
   return (
     <div className="fk-categories-wrapper">
       {/* Flipkart Split-Pane Container */}
       <div className="fk-categories-container">
-        {/* Left Vertical Category Navigation Sidebar (Home Option Removed) */}
+        {/* Dynamic Left Vertical Sidebar Navigation (Contains ONLY Categories Present in Shop) */}
         <aside className="fk-cat-sidebar">
-          {CATEGORY_SIDEBAR.map((cat) => {
-            const IconComponent = cat.icon;
-            const isActive = activeCat === cat.id;
+          {sidebarItems.map((item) => {
+            const IconComponent = item.icon;
+            const isActive = activeCat === item.id;
 
             return (
               <button
-                key={cat.id}
+                key={item.id}
                 className={`fk-cat-sidebar-item ${isActive ? 'fk-cat-sidebar-item--active' : ''}`}
-                onClick={() => setActiveCat(cat.id)}
+                onClick={() => setActiveCat(item.id)}
               >
                 <div
                   className="fk-cat-sidebar-icon-avatar"
-                  style={{ backgroundColor: cat.bg, color: cat.color }}
+                  style={{ backgroundColor: item.bg, color: item.color }}
                 >
                   <IconComponent size={20} />
                 </div>
-                <span className="fk-cat-sidebar-label">{cat.label}</span>
+                <span className="fk-cat-sidebar-label">{item.label}</span>
               </button>
             );
           })}
         </aside>
 
-        {/* Right Main Content Area (Separated Category-Wise) */}
+        {/* Right Main Content Area (Organized in exact matching category order) */}
         <main className="fk-cat-main-content">
           {loading && (
             <div className="fk-cat-skeleton-grid">
@@ -131,19 +178,19 @@ function Categories() {
             </div>
           )}
 
-          {/* When "For You" (All) is selected: Render Products Grouped Category-Wise */}
+          {/* When "For You" (All) is selected: Render Products Grouped in Exact Sidebar Category Order */}
           {!loading && !error && activeCat === 'all' && (
             <div className="fk-cat-separated-groups">
-              {Object.keys(groupedProducts).map((catName) => (
+              {availableCategories.map((catName) => (
                 <section key={catName} className="fk-cat-group-block">
                   <div className="fk-cat-group-header">
                     <h3 className="fk-cat-group-title">{catName}</h3>
                     <span className="fk-cat-group-count">
-                      {groupedProducts[catName].length} items
+                      {categoryGroups[catName].length} {categoryGroups[catName].length === 1 ? 'item' : 'items'}
                     </span>
                   </div>
                   <div className="fk-cat-products-grid">
-                    {groupedProducts[catName].map((product) => (
+                    {categoryGroups[catName].map((product) => (
                       <ProductCard key={product._id} product={product} />
                     ))}
                   </div>
@@ -152,25 +199,25 @@ function Categories() {
             </div>
           )}
 
-          {/* When a Specific Category Tab is Selected */}
+          {/* When a Specific Category Tab is Selected from Sidebar */}
           {!loading && !error && activeCat !== 'all' && (
             <section className="fk-cat-group-block">
               <div className="fk-cat-group-header">
-                <h3 className="fk-cat-group-title">{currentCategoryInfo.label}</h3>
+                <h3 className="fk-cat-group-title">{activeCat}</h3>
                 <span className="fk-cat-group-count">
-                  {filteredProducts.length} items
+                  {(categoryGroups[activeCat] || []).length} {(categoryGroups[activeCat] || []).length === 1 ? 'item' : 'items'}
                 </span>
               </div>
-              {filteredProducts.length > 0 ? (
+              {categoryGroups[activeCat] && categoryGroups[activeCat].length > 0 ? (
                 <div className="fk-cat-products-grid">
-                  {filteredProducts.map((product) => (
+                  {categoryGroups[activeCat].map((product) => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
               ) : (
                 <div className="fk-cat-message">
                   <FiInbox size={24} />
-                  <p>No products in {currentCategoryInfo.label}</p>
+                  <p>No products in {activeCat}</p>
                 </div>
               )}
             </section>
