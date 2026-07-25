@@ -191,42 +191,151 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* Flipkart Mobile Header Container */
+.flipkart-mobile-header {
+  display: none;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
+  .navbar-container {
+    display: none; /* Hide desktop header container on mobile */
+  }
+
   .navbar-header {
-    background-color: #2874f0; /* Flipkart Primary Blue */
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .flipkart-mobile-header {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #5b1fae 0%, #47118d 100%); /* Deep Purple matching Flipkart */
+    padding: 10px 12px 12px 12px;
+    gap: 10px;
     color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
-  .navbar-logo {
-    color: #ffffff !important;
+  /* Tier 1: Brand Pills Row */
+  .flipkart-mobile-pills-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .navbar-logo span {
-    color: #ffe500 !important; /* Flipkart Accent Yellow */
+  .flipkart-brand-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #ffe500; /* Flipkart Yellow */
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
-  .mobile-nav-toggle {
-    color: #ffffff !important;
+  .flipkart-brand-pill__bold {
+    font-weight: 800;
+    color: #2874f0;
   }
 
-  .navbar-cart-btn {
-    color: #ffffff !important;
+  .flipkart-brand-pill__italic {
+    font-style: italic;
+    color: #0f172a;
   }
 
-  .navbar-profile-btn {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+  .flipkart-travel-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #ffffff;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
   }
 
-  .navbar-search {
-    display: none;
+  /* Tier 2: Location Row */
+  .flipkart-mobile-location-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    padding: 2px 0;
   }
 
-  .navbar-wishlist-btn {
-    display: none;
+  .flipkart-location-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .flipkart-location-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+    font-weight: 500;
+  }
+
+  .flipkart-coins-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+
+  /* Tier 3: Search Bar Row */
+  .flipkart-mobile-search-row {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 8px 12px;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+
+  .flipkart-search-icon {
+    color: #64748b;
+  }
+
+  .flipkart-mobile-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: inherit;
+    color: #0f172a;
+    background: transparent;
+  }
+
+  .flipkart-mobile-search-input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  .flipkart-search-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
   }
 
   /* Mobile overlay */

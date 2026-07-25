@@ -1,23 +1,20 @@
 import { NavLink } from 'react-router-dom';
 import {
   FiHome,
+  FiPlay,
   FiGrid,
-  FiShoppingBag,
-  FiHeart,
-  FiShoppingCart,
   FiUser,
+  FiShoppingCart,
 } from 'react-icons/fi';
 import { useCart } from '../../../context/CartContext';
-import { useWishlist } from '../../../context/WishlistContext';
 import { useAuth } from '../../../context/AuthContext';
 import './BottomNav.css';
 
 function BottomNav() {
   const { cartCount } = useCart();
-  const { wishlistCount } = useWishlist();
   const { isAuthenticated, user } = useAuth();
 
-  const profilePath = isAuthenticated
+  const accountPath = isAuthenticated
     ? user?.role === 'admin'
       ? '/admin/dashboard'
       : '/profile'
@@ -37,6 +34,16 @@ function BottomNav() {
       </NavLink>
 
       <NavLink
+        to="/shop"
+        className={({ isActive }) =>
+          `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
+        }
+      >
+        <FiPlay size={20} className="bottom-nav-icon" />
+        <span className="bottom-nav-label">Shop</span>
+      </NavLink>
+
+      <NavLink
         to="/categories"
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
@@ -47,28 +54,13 @@ function BottomNav() {
       </NavLink>
 
       <NavLink
-        to="/shop"
+        to={accountPath}
         className={({ isActive }) =>
           `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
         }
       >
-        <FiShoppingBag size={20} className="bottom-nav-icon" />
-        <span className="bottom-nav-label">Shop</span>
-      </NavLink>
-
-      <NavLink
-        to="/wishlist"
-        className={({ isActive }) =>
-          `bottom-nav-item ${isActive ? 'bottom-nav-item--active' : ''}`
-        }
-      >
-        <div className="bottom-nav-icon-wrapper">
-          <FiHeart size={20} className="bottom-nav-icon" />
-          {wishlistCount > 0 && (
-            <span className="bottom-nav-badge">{wishlistCount > 99 ? '99+' : wishlistCount}</span>
-          )}
-        </div>
-        <span className="bottom-nav-label">Wishlist</span>
+        <FiUser size={20} className="bottom-nav-icon" />
+        <span className="bottom-nav-label">Account</span>
       </NavLink>
 
       <NavLink
@@ -80,7 +72,7 @@ function BottomNav() {
         <div className="bottom-nav-icon-wrapper">
           <FiShoppingCart size={20} className="bottom-nav-icon" />
           {cartCount > 0 && (
-            <span className="bottom-nav-badge bottom-nav-badge--yellow">{cartCount > 99 ? '99+' : cartCount}</span>
+            <span className="bottom-nav-badge">{cartCount > 99 ? '99+' : cartCount}</span>
           )}
         </div>
         <span className="bottom-nav-label">Cart</span>
