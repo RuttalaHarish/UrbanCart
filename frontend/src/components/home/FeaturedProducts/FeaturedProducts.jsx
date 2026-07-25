@@ -14,7 +14,7 @@ function FeaturedProducts() {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(PRODUCT_ENDPOINTS.LIST);
+      const response = await api.get(`${PRODUCT_ENDPOINTS.LIST}?limit=100`);
       if (response.data && Array.isArray(response.data.data)) {
         setProducts(response.data.data);
       } else {

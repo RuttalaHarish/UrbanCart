@@ -114,7 +114,7 @@ function Shop() {
       if (currentPageParam > 1) {
         params.append('page', currentPageParam);
       }
-      params.append('limit', pagination.limit || 12);
+      params.append('limit', 100);
 
       const queryString = params.toString();
       const endpoint = queryString
