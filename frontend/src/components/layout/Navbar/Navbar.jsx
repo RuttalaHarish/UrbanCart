@@ -10,11 +10,6 @@ import {
   FiLogOut,
   FiLogIn,
   FiPackage,
-  FiMapPin,
-  FiChevronRight,
-  FiCamera,
-  FiGrid,
-  FiZap,
 } from 'react-icons/fi';
 import { useAuth } from '../../../context/AuthContext';
 import { useCart } from '../../../context/CartContext';
@@ -84,50 +79,6 @@ function Navbar() {
 
   return (
     <header className="navbar-header">
-      {/* ===== Flipkart Mobile-Specific Header Layout (Only Visible on Mobile <= 768px) ===== */}
-      <div className="flipkart-mobile-header">
-        {/* Tier 1: Brand Switcher Pills */}
-        <div className="flipkart-mobile-pills-row">
-          <div className="flipkart-brand-pill" onClick={() => navigate('/')}>
-            <span className="flipkart-brand-pill__bold">⚡ Urban</span>
-            <span className="flipkart-brand-pill__italic">Cart</span>
-          </div>
-          <div className="flipkart-travel-pill" onClick={() => navigate('/shop')}>
-            <span className="flipkart-travel-pill__icon">✈️</span> Travel
-          </div>
-        </div>
-
-        {/* Tier 2: Location Delivery Bar & SuperCoins Badge */}
-        <div className="flipkart-mobile-location-row">
-          <div className="flipkart-location-info">
-            <FiMapPin className="flipkart-location-icon" size={14} />
-            <span className="flipkart-location-text">Deliver to Select Location</span>
-            <FiChevronRight className="flipkart-location-chevron" size={14} />
-          </div>
-          <div className="flipkart-coins-badge">
-            <FiZap size={12} className="flipkart-coins-icon" /> 0
-          </div>
-        </div>
-
-        {/* Tier 3: Prominent Full Width Search Bar */}
-        <div className="flipkart-mobile-search-row">
-          <FiSearch className="flipkart-search-icon" size={18} />
-          <input
-            type="text"
-            className="flipkart-mobile-search-input"
-            placeholder="Search for Products, Brands and More"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={handleSearch}
-          />
-          <div className="flipkart-search-actions">
-            <FiCamera size={18} className="flipkart-camera-icon" />
-            <FiGrid size={18} className="flipkart-grid-icon" />
-          </div>
-        </div>
-      </div>
-
-      {/* ===== Standard Desktop Container (Hidden on Mobile) ===== */}
       <div className="container navbar-container">
         {/* Brand Logo */}
         <Link to="/" className="navbar-logo">
@@ -240,7 +191,7 @@ function Navbar() {
         </div>
       </div>
 
-      {/* ===== Mobile Menu Drawer ===== */}
+      {/* ===== Mobile Menu ===== */}
       <div
         className={`mobile-nav-overlay ${mobileOpen ? 'mobile-nav-overlay--open' : ''}`}
         onClick={() => setMobileOpen(false)}
