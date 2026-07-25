@@ -229,6 +229,46 @@
     display: none;
   }
 
+  /* Mobile Search Bar Row (Flipkart Style) */
+  .mobile-search-bar-row {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 0 16px 12px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-search-bar-input {
+    width: 100%;
+    padding: 10px 14px 10px 38px;
+    font-size: 13px;
+    font-family: inherit;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-sizing: border-box;
+  }
+
+  .mobile-search-bar-input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  .mobile-search-icon-wrapper {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-70%);
+    color: #64748b;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+
   /* Mobile overlay */
   .mobile-nav-overlay {
     display: none;

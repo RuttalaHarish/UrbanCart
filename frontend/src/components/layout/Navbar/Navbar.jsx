@@ -191,6 +191,22 @@ function Navbar() {
         </div>
       </div>
 
+      {/* ===== Mobile Direct Search Bar Row ===== */}
+      <div className="mobile-search-bar-row">
+        <span className="mobile-search-icon-wrapper">
+          <FiSearch size={15} />
+        </span>
+        <input
+          type="text"
+          className="mobile-search-bar-input"
+          placeholder="Search for Products, Brands and More"
+          aria-label="Search products"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleSearch}
+        />
+      </div>
+
       {/* ===== Mobile Menu ===== */}
       <div
         className={`mobile-nav-overlay ${mobileOpen ? 'mobile-nav-overlay--open' : ''}`}
