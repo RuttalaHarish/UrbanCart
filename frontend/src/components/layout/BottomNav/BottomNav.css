@@ -1,0 +1,75 @@
+/* Flipkart-Style Fixed Mobile Bottom Navigation Bar */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  z-index: 1000;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  color: #616161;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 500;
+  transition: color 0.15s ease-in-out;
+  padding: 4px 0;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item--active {
+  color: #2874f0; /* Flipkart Blue */
+}
+
+.bottom-nav-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-nav-icon {
+  margin-bottom: 2px;
+}
+
+.bottom-nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 10px;
+  border: 1.5px solid #ffffff;
+  min-width: 14px;
+  text-align: center;
+}
+
+.bottom-nav-badge--yellow {
+  background-color: #ff9f00; /* Flipkart Orange/Yellow */
+  color: #ffffff;
+}
+
+/* Display only on mobile viewports */
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+  }
+}

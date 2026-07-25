@@ -182,10 +182,12 @@
 
 @media (max-width: 640px) {
   .featured-products-grid {
-    grid-template-columns: 1fr; /* 1 card per row (Mobile) */
+    grid-template-columns: repeat(2, 1fr); /* 2-column Flipkart mobile grid */
+    gap: 10px;
   }
 
   .featured-products-header {
-    text-align: center;
+    text-align: left;
+    padding: 0 4px;
   }
 }

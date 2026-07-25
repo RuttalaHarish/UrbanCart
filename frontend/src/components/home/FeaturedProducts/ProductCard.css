@@ -205,3 +205,33 @@
   border-color: var(--color-text-secondary);
   transform: translateY(-1px);
 }
+
+/* Responsive 2-column mobile optimization */
+@media (max-width: 640px) {
+  .product-card-body {
+    padding: 10px;
+    gap: 4px;
+  }
+
+  .product-card-name {
+    font-size: 13px;
+    height: 2.2rem;
+    line-height: 1.15;
+  }
+
+  .product-card-price {
+    font-size: 15px;
+    margin: 4px 0;
+  }
+
+  .product-card-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .product-card-btn {
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: var(--radius-md);
+  }
+}

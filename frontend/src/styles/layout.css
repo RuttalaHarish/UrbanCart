@@ -290,6 +290,10 @@
 
 /* --- 7. Responsive Style Overrides --- */
 @media (max-width: 768px) {
+  .main-layout-content {
+    padding-bottom: 60px;
+  }
+
   .navbar-links {
     display: none; /* Hide default nav list on mobile in layout framework */
   }

@@ -78,20 +78,49 @@
   color: #ffffff;
 }
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
+/* Responsive Flipkart-style mobile category avatars */
+@media (max-width: 768px) {
+  .category-nav-bar {
+    background-color: #ffffff;
+    padding: 8px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
   .category-nav-container {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    gap: var(--spacing-xs);
+    gap: 16px;
+    padding: 4px 12px;
   }
 
   .category-nav-item {
-    padding: 6px 12px;
-    font-size: var(--font-size-xs);
+    flex-direction: column;
+    align-items: center;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 0;
+    font-size: 11px;
+    color: #212121;
   }
 
   .category-nav-icon {
-    width: 15px;
-    height: 15px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: #f0f5ff;
+    color: #2874f0;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+  }
+
+  .category-nav-item.active .category-nav-icon {
+    background-color: #2874f0;
+    color: #ffffff;
+  }
+
+  .category-nav-item.active {
+    background: transparent;
+    color: #2874f0;
+    font-weight: 700;
   }
 }

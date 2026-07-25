@@ -193,6 +193,34 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
+  .navbar-header {
+    background-color: #2874f0; /* Flipkart Primary Blue */
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  }
+
+  .navbar-logo {
+    color: #ffffff !important;
+  }
+
+  .navbar-logo span {
+    color: #ffe500 !important; /* Flipkart Accent Yellow */
+  }
+
+  .mobile-nav-toggle {
+    color: #ffffff !important;
+  }
+
+  .navbar-cart-btn {
+    color: #ffffff !important;
+  }
+
+  .navbar-profile-btn {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+  }
+
   .navbar-search {
     display: none;
   }

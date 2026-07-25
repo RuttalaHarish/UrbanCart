@@ -109,7 +109,7 @@ function Navbar() {
           <input
             type="text"
             className="navbar-search__input"
-            placeholder="Search products..."
+            placeholder="Search for Products, Brands and More"
             aria-label="Search products"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -213,7 +213,7 @@ function Navbar() {
           <input
             type="text"
             className="navbar-search__input"
-            placeholder="Search products..."
+            placeholder="Search for Products, Brands and More"
             aria-label="Search products"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

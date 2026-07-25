@@ -333,7 +333,8 @@
 @media (max-width: 640px) {
   .shop-grid,
   .shop-skeleton-grid {
-    grid-template-columns: 1fr; /* 1 column on mobile */
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on Flipkart mobile grid */
+    gap: 10px;
   }
 
   .shop-header {
