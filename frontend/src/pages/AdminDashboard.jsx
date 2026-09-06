@@ -211,34 +211,51 @@ function AdminDashboard() {
     }
     setError(null);
     try {
-      const [statsRes, ordersRes, productsRes, categoriesRes] = await Promise.all([
+      const [statsRes, ordersRes, productsRes, categoriesRes] = await Promise.allSettled([
         api.get(ORDER_ENDPOINTS.DASHBOARD_STATS),
         api.get(ORDER_ENDPOINTS.ALL),
         api.get(PRODUCT_ENDPOINTS.LIST),
         api.get(CATEGORY_ENDPOINTS.LIST),
       ]);
 
-      if (statsRes.data && statsRes.data.data) {
-        setStats(statsRes.data.data);
-      } else {
-        throw new Error('Invalid statistics response');
+      let loadedCount = 0;
+
+      if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
+        const statsObj = statsRes.value.data.data || statsRes.value.data;
+        if (statsObj && typeof statsObj === 'object') {
+          setStats(statsObj);
+          loadedCount++;
+        }
       }
 
-      if (ordersRes.data && Array.isArray(ordersRes.data.data)) {
-        setAllOrders(ordersRes.data.data);
-      } else {
-        setAllOrders([]);
+      if (ordersRes.status === 'fulfilled' && ordersRes.value?.data) {
+        const rawOrders =
+          ordersRes.value.data.data ||
+          ordersRes.value.data.orders ||
+          (Array.isArray(ordersRes.value.data) ? ordersRes.value.data : []);
+        setAllOrders(Array.isArray(rawOrders) ? rawOrders : []);
+        loadedCount++;
       }
 
-      const productsList = Array.isArray(productsRes.data)
-        ? productsRes.data
-        : productsRes.data?.data || productsRes.data?.products || [];
-      setAllProducts(productsList);
+      if (productsRes.status === 'fulfilled' && productsRes.value?.data) {
+        const rawProducts = Array.isArray(productsRes.value.data)
+          ? productsRes.value.data
+          : productsRes.value.data.data || productsRes.value.data.products || [];
+        setAllProducts(Array.isArray(rawProducts) ? rawProducts : []);
+        loadedCount++;
+      }
 
-      const categoriesList = Array.isArray(categoriesRes.data)
-        ? categoriesRes.data
-        : categoriesRes.data?.data || categoriesRes.data?.categories || [];
-      setAllCategories(categoriesList);
+      if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.data) {
+        const rawCategories = Array.isArray(categoriesRes.value.data)
+          ? categoriesRes.value.data
+          : categoriesRes.value.data.data || categoriesRes.value.data.categories || [];
+        setAllCategories(Array.isArray(rawCategories) ? rawCategories : []);
+        loadedCount++;
+      }
+
+      if (loadedCount === 0) {
+        throw new Error('Failed to load dashboard statistics or orders.');
+      }
     } catch (err) {
       console.error('Fetch dashboard data failure:', err);
       setError('Failed to load dashboard data.');
