@@ -183,7 +183,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const [dateRange, setDateRange] = useState('7days');
+  const [dateRange, setDateRange] = useState('all');
 
   const scrollToSalesAnalytics = () => {
     if (salesAnalyticsRef.current) {
@@ -355,7 +355,7 @@ function AdminDashboard() {
     const trendList = [];
     const now = new Date();
 
-    if (dateRange === '7days') {
+    if (dateRange === 'all' || dateRange === '7days') {
       for (let i = 6; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
         const dayNameShort = d.toLocaleDateString('en-US', { weekday: 'short' });
@@ -1054,6 +1054,7 @@ function AdminDashboard() {
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
             >
+              <option value="all">All Time</option>
               <option value="7days">Last 7 Days</option>
               <option value="30days">Last 30 Days</option>
               <option value="90days">Last 90 Days</option>
@@ -1085,7 +1086,7 @@ function AdminDashboard() {
             </div>
             <div className="admin-stats-info">
               <span className="admin-stats-label">
-                {dateRange === '7days' ? 'Weekly Sales' : dateRange === '30days' ? '30-Day Sales' : dateRange === '90days' ? '90-Day Sales' : dateRange === 'thisMonth' ? 'Monthly Sales' : 'Yearly Sales'}
+                {dateRange === 'all' ? 'All-Time Sales' : dateRange === '7days' ? 'Weekly Sales' : dateRange === '30days' ? '30-Day Sales' : dateRange === '90days' ? '90-Day Sales' : dateRange === 'thisMonth' ? 'Monthly Sales' : 'Yearly Sales'}
               </span>
               <span className="admin-stats-value">
                 <CountUpValue value={salesAnalytics.rangeRevenue} formatter={formatCurrency} />
