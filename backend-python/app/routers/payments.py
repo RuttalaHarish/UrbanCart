@@ -7,6 +7,8 @@ POST /api/payments/verify         — verify HMAC signature, mark order as Paid,
 import hashlib
 import hmac
 import os
+import random
+import time
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -22,14 +24,25 @@ from ..utils import is_valid_object_id, serialize_id
 
 router = APIRouter(prefix="/api/payments", tags=["Payments"])
 
-# ── Razorpay Client ──────────────────────────────────────────────────────────
+# ── Razorpay Client (lazy init) ──────────────────────────────────────────────
+# Initialized on first use so that .env is guaranteed to be loaded first.
 
-_RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
-_RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "dummy_key_secret")
+_razorpay_client: Optional[razorpay.Client] = None
 
-_razorpay_client = razorpay.Client(
-    auth=(_RAZORPAY_KEY_ID, _RAZORPAY_KEY_SECRET)
-)
+
+def _get_razorpay_client() -> razorpay.Client:
+    """Return the Razorpay client, initializing it on first use."""
+    global _razorpay_client
+    if _razorpay_client is None:
+        key_id = os.getenv("RAZORPAY_KEY_ID", "")
+        key_secret = os.getenv("RAZORPAY_KEY_SECRET", "")
+        if not key_id or not key_secret:
+            raise HTTPException(
+                status_code=500,
+                detail="Razorpay credentials not configured",
+            )
+        _razorpay_client = razorpay.Client(auth=(key_id, key_secret))
+    return _razorpay_client
 
 
 # ── Request Schemas ──────────────────────────────────────────────────────────
@@ -81,7 +94,6 @@ async def create_razorpay_order(
     if body.orderId:
         receipt_id = f"rcpt_{body.orderId[-12:]}"
     else:
-        import time, random
         receipt_id = f"rcpt_{int(time.time())}_{random.randint(0, 999)}"
 
     # 5. Call Razorpay API
@@ -91,7 +103,9 @@ async def create_razorpay_order(
         "receipt": receipt_id,
     }
     try:
-        razorpay_order = _razorpay_client.order.create(data=options)
+        razorpay_order = _get_razorpay_client().order.create(data=options)
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(
             status_code=500,
@@ -125,12 +139,15 @@ async def verify_payment(
 
     # 2. Generate expected HMAC SHA256 signature
     sign_body = f"{body.razorpay_order_id}|{body.razorpay_payment_id}"
-    generated_signature = hmac.new(
-        _RAZORPAY_KEY_SECRET.encode("utf-8"),
-        sign_body.encode("utf-8"),
-        hashlib.sha256,
+    key_secret = os.getenv("RAZORPAY_KEY_SECRET", "")
+    if not key_secret:
+        raise HTTPException(status_code=500, detail="Razorpay credentials not configured")
+
+    generated_signature = hmac.HMAC(
+        key=key_secret.encode("utf-8"),
+        msg=sign_body.encode("utf-8"),
+        digestmod=hashlib.sha256,
     ).hexdigest()
-    # Note: Python's hmac.new() is the correct call here (stdlib hmac module)
 
     # 3. Secure comparison
     if hmac.compare_digest(generated_signature, body.razorpay_signature):

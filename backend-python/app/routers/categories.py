@@ -16,7 +16,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel, field_validator
 
 from ..database import get_db
-from ..dependencies import get_current_user, require_admin
+from ..dependencies import require_admin
 from ..utils import is_valid_object_id, serialize_id
 
 router = APIRouter(prefix="/api/categories", tags=["Categories"])
@@ -74,7 +74,7 @@ async def get_category_by_id(id: str, db: AsyncIOMotorDatabase = Depends(get_db)
 @router.post("", status_code=201)
 async def create_category(
     body: CategoryBody,
-    current_user: dict = Depends(get_current_user),
+    _: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Create a new category (admin only)."""
@@ -106,7 +106,7 @@ async def create_category(
 async def update_category(
     id: str,
     body: UpdateCategoryBody,
-    current_user: dict = Depends(get_current_user),
+    _: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Update a category by ID (admin only)."""
@@ -145,7 +145,7 @@ async def update_category(
 @router.delete("/{id}")
 async def delete_category(
     id: str,
-    current_user: dict = Depends(get_current_user),
+    _: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Delete a category by ID (admin only)."""

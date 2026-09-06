@@ -17,7 +17,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel, field_validator
 
 from ..database import get_db
-from ..dependencies import get_current_user, require_admin
+from ..dependencies import require_admin
 from ..utils import is_valid_object_id, serialize_id
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
@@ -169,7 +169,7 @@ async def get_product_by_id(id: str, db: AsyncIOMotorDatabase = Depends(get_db))
 @router.post("", status_code=201)
 async def create_product(
     body: ProductBody,
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Create a new product."""
@@ -203,7 +203,7 @@ async def create_product(
 async def update_product(
     id: str,
     body: UpdateProductBody,
-    current_user: dict = Depends(get_current_user),
+    _: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Update a product by ID."""
@@ -237,7 +237,7 @@ async def update_product(
 @router.delete("/{id}")
 async def delete_product(
     id: str,
-    current_user: dict = Depends(get_current_user),
+    _: dict = Depends(require_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Delete a product by ID."""
