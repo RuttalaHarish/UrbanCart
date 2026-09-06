@@ -280,6 +280,7 @@ async def get_dashboard_stats(
     """Return high-level business metrics for the admin dashboard."""
     total_orders = await db.orders.count_documents({})
     pending_orders = await db.orders.count_documents({"orderStatus": "Pending"})
+    delivered_orders = await db.orders.count_documents({"orderStatus": "Delivered"})
     total_users = await db.users.count_documents({})
     total_products = await db.products.count_documents({})
 
@@ -295,6 +296,7 @@ async def get_dashboard_stats(
         "data": {
             "totalOrders": total_orders,
             "pendingOrders": pending_orders,
+            "deliveredOrders": delivered_orders,
             "totalRevenue": total_revenue,
             "totalUsers": total_users,
             "totalProducts": total_products,

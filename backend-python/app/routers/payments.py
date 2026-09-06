@@ -161,18 +161,20 @@ async def verify_payment(
             target_order = await db.orders.find_one({"razorpayOrderId": body.razorpay_order_id})
 
         if target_order:
-            # 5. Mark order as Paid
+            # 5. Mark order as Paid and transition status to Processing if Pending
+            update_fields = {
+                "paymentStatus": "Paid",
+                "razorpayOrderId": body.razorpay_order_id,
+                "razorpayPaymentId": body.razorpay_payment_id,
+                "razorpaySignature": body.razorpay_signature,
+                "updatedAt": datetime.now(tz=timezone.utc),
+            }
+            if target_order.get("orderStatus") == "Pending":
+                update_fields["orderStatus"] = "Processing"
+
             await db.orders.update_one(
                 {"_id": target_order["_id"]},
-                {
-                    "$set": {
-                        "paymentStatus": "Paid",
-                        "razorpayOrderId": body.razorpay_order_id,
-                        "razorpayPaymentId": body.razorpay_payment_id,
-                        "razorpaySignature": body.razorpay_signature,
-                        "updatedAt": datetime.now(tz=timezone.utc),
-                    }
-                },
+                {"$set": update_fields},
             )
             # 6. Clear the user's cart
             await db.carts.update_one(
@@ -180,6 +182,8 @@ async def verify_payment(
                 {"$set": {"items": [], "updatedAt": datetime.now(tz=timezone.utc)}},
             )
             target_order["paymentStatus"] = "Paid"
+            if target_order.get("orderStatus") == "Pending":
+                target_order["orderStatus"] = "Processing"
 
         return {
             "success": True,

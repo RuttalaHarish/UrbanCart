@@ -609,7 +609,7 @@ function AdminDashboard() {
           <div className="admin-stats-info">
             <span className="admin-stats-label">Total Orders</span>
             <span className="admin-stats-value">
-              <CountUpValue value={stats.totalOrders} />
+              <CountUpValue value={stats?.totalOrders ?? allOrders.length} />
             </span>
           </div>
         </div>
@@ -630,7 +630,12 @@ function AdminDashboard() {
           <div className="admin-stats-info">
             <span className="admin-stats-label">Pending Orders</span>
             <span className="admin-stats-value">
-              <CountUpValue value={stats.pendingOrders} />
+              <CountUpValue
+                value={
+                  stats?.pendingOrders ??
+                  allOrders.filter((o) => o.orderStatus === 'Pending').length
+                }
+              />
             </span>
           </div>
         </div>
@@ -651,7 +656,12 @@ function AdminDashboard() {
           <div className="admin-stats-info">
             <span className="admin-stats-label">Delivered Orders</span>
             <span className="admin-stats-value">
-              <CountUpValue value={stats.deliveredOrders} />
+              <CountUpValue
+                value={
+                  stats?.deliveredOrders ??
+                  allOrders.filter((o) => o.orderStatus === 'Delivered').length
+                }
+              />
             </span>
           </div>
         </div>
