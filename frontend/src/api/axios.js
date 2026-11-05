@@ -6,9 +6,8 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  // Fail fast (10 s) so the UI shows an error instead of hanging indefinitely
-  // when the backend server or MongoDB is unreachable.
-  timeout: 10000,
+  // Ultra-fast timeout (3s) so the UI responds immediately and never hangs
+  timeout: 3000,
 });
 
 /* ─── Request Interceptor ───────────────────────────────────────────

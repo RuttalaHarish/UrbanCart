@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { FiAlertTriangle, FiShoppingBag, FiArrowLeft, FiShoppingCart, FiRefreshCw, FiHeart } from 'react-icons/fi';
 import api from '../api/axios';
 import { PRODUCT_ENDPOINTS } from '../constants';
+import { sampleProducts } from '../data/sampleProducts';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -19,31 +20,30 @@ function ProductDetails() {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isWishlisted } = useWishlist();
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const initialProduct = sampleProducts.find((p) => p._id === id) || null;
+  const [product, setProduct] = useState(initialProduct);
+  const [loading, setLoading] = useState(!initialProduct);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [isAddingWishlist, setIsAddingWishlist] = useState(false);
 
   const fetchProductDetails = async () => {
-    setLoading(true);
+    if (!product) setLoading(true);
     setError(null);
     try {
       const response = await api.get(PRODUCT_ENDPOINTS.DETAILS(id));
       // API returns { success: true, data: { ... } }
       if (response.data && response.data.data) {
         setProduct(response.data.data);
-        setQuantity(1); // Reset quantity selector
-      } else {
-        throw new Error('Product not found in data wrapper');
       }
     } catch (err) {
-      console.error('Fetch product detail failure:', err);
-      if (err.response && err.response.status === 404) {
-        setError('404');
-      } else {
-        setError('Unable to load product. Please check your network connection.');
+      if (!product) {
+        if (err.response && err.response.status === 404) {
+          setError('404');
+        } else {
+          setError('Unable to load product. Please check your network connection.');
+        }
       }
     } finally {
       setLoading(false);

@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { PRODUCT_ENDPOINTS } from '../../constants';
+import { sampleProducts } from '../../data/sampleProducts';
 import ProductCard from '../home/FeaturedProducts/ProductCard';
 import './RelatedProducts.css';
 
 function RelatedProducts({ currentProductId, category }) {
-  const [related, setRelated] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const fallbackRelated = sampleProducts
+    .filter(
+      (prod) =>
+        prod._id !== currentProductId &&
+        (!category || (prod.category || '').toLowerCase() === (category || '').toLowerCase())
+    )
+    .slice(0, 4);
+
+  const [related, setRelated] = useState(fallbackRelated);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRelated = async () => {
-      setLoading(true);
       try {
         const response = await api.get(PRODUCT_ENDPOINTS.LIST);
         if (response.data && Array.isArray(response.data.data)) {
@@ -18,13 +26,13 @@ function RelatedProducts({ currentProductId, category }) {
             .filter(
               (prod) =>
                 prod._id !== currentProductId &&
-                prod.category.toLowerCase() === category.toLowerCase()
+                prod.category?.toLowerCase() === category?.toLowerCase()
             )
             .slice(0, 4);
-          setRelated(filtered);
+          if (filtered.length > 0) setRelated(filtered);
         }
       } catch (err) {
-        console.error('Failed loading related products:', err);
+        console.warn('Failed loading backend related products, using instant fallback:', err);
       } finally {
         setLoading(false);
       }

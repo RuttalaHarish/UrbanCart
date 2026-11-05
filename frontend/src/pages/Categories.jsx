@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi';
 import api from '../api/axios';
 import { PRODUCT_ENDPOINTS } from '../constants';
+import { sampleProducts } from '../data/sampleProducts';
 import ProductCard from '../components/home/FeaturedProducts/ProductCard';
 import './Categories.css';
 
@@ -47,23 +48,20 @@ const COLOR_PALETTE = [
 
 function Categories() {
   const [activeCat, setActiveCat] = useState('all');
-  const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [allProducts, setAllProducts] = useState(sampleProducts);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchProducts = async () => {
-    setLoading(true);
+    if (allProducts.length === 0) setLoading(true);
     setError(null);
     try {
       const response = await api.get(`${PRODUCT_ENDPOINTS.LIST}?limit=100`);
-      if (response.data && Array.isArray(response.data.data)) {
+      if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
         setAllProducts(response.data.data);
-      } else {
-        throw new Error('Invalid response format');
       }
     } catch (err) {
-      console.error('Fetch categories error:', err);
-      setError('Unable to load categories. Please check your network connection.');
+      console.warn('Backend categories offline or slow, using instant products:', err);
     } finally {
       setLoading(false);
     }

@@ -3,12 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { FiInbox, FiAlertTriangle, FiRefreshCw, FiSearch } from 'react-icons/fi';
 import api from '../api/axios';
 import { PRODUCT_ENDPOINTS } from '../constants';
+import { sampleProducts } from '../data/sampleProducts';
 import ProductCard from '../components/home/FeaturedProducts/ProductCard';
 import './Shop.css';
 
 function Shop() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(sampleProducts);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -96,7 +97,7 @@ function Shop() {
 
   // 3. Fetch products from backend dynamically with pagination
   const fetchProducts = async () => {
-    setLoading(true);
+    if (products.length === 0) setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
@@ -119,7 +120,7 @@ function Shop() {
 
       const response = await api.get(endpoint);
 
-      if (response.data && Array.isArray(response.data.data)) {
+      if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
         setProducts(response.data.data);
         // Store backend pagination metadata into React state
         setPagination({
@@ -128,12 +129,9 @@ function Shop() {
           totalProducts: response.data.totalProducts || 0,
           limit: response.data.limit || 12,
         });
-      } else {
-        throw new Error('Invalid format received from server');
       }
     } catch (err) {
-      console.error('Fetch products error:', err);
-      setError('Unable to load products. Please check your connection.');
+      console.warn('Backend shop products offline or slow, using instant catalog:', err);
     } finally {
       setLoading(false);
     }

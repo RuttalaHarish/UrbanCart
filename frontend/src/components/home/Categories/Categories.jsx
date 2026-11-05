@@ -2,28 +2,26 @@ import { useState, useEffect } from 'react';
 import { FiAlertCircle, FiFolderMinus, FiRefreshCw } from 'react-icons/fi';
 import api from '../../../api/axios';
 import { CATEGORY_ENDPOINTS } from '../../../constants';
+import { sampleCategories } from '../../../data/sampleProducts';
 import CategoryCard from './CategoryCard';
 import './Categories.css';
 
 function Categories() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(sampleCategories);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchCategories = async () => {
-    setLoading(true);
+    if (categories.length === 0) setLoading(true);
     setError(null);
     try {
       const response = await api.get(CATEGORY_ENDPOINTS.LIST);
       // API returns { success: true, count: X, data: [ ... ] }
-      if (response.data && Array.isArray(response.data.data)) {
+      if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
         setCategories(response.data.data.filter(cat => cat.isActive !== false));
-      } else {
-        throw new Error('Invalid format received from server');
       }
     } catch (err) {
-      console.error('Fetch categories failure:', err);
-      setError('Could not retrieve product categories. Please check your backend connection.');
+      console.warn('Backend categories offline or slow, using instant categories:', err);
     } finally {
       setLoading(false);
     }

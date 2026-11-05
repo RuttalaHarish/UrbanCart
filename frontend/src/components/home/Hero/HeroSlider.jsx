@@ -39,8 +39,8 @@ const formatINR = (price) => {
 };
 
 function HeroSlider() {
-  const [slides, setSlides] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [slides, setSlides] = useState(fallbackSlides);
+  const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
   const timeoutRef = useRef(null);
@@ -50,7 +50,6 @@ function HeroSlider() {
     let isMounted = true;
 
     const fetchHeroProducts = async () => {
-      setLoading(true);
       try {
         const response = await api.get(PRODUCT_ENDPOINTS.LIST);
         if (

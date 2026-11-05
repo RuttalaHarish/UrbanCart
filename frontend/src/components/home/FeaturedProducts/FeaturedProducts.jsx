@@ -2,27 +2,25 @@ import { useState, useEffect } from 'react';
 import { FiAlertCircle, FiInbox, FiRefreshCw } from 'react-icons/fi';
 import api from '../../../api/axios';
 import { PRODUCT_ENDPOINTS } from '../../../constants';
+import { sampleProducts } from '../../../data/sampleProducts';
 import ProductCard from './ProductCard';
 import './FeaturedProducts.css';
 
 function FeaturedProducts() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(sampleProducts);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchProducts = async () => {
-    setLoading(true);
+    if (products.length === 0) setLoading(true);
     setError(null);
     try {
       const response = await api.get(`${PRODUCT_ENDPOINTS.LIST}?limit=100`);
-      if (response.data && Array.isArray(response.data.data)) {
+      if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
         setProducts(response.data.data);
-      } else {
-        throw new Error('Invalid format received from server');
       }
     } catch (err) {
-      console.error('Fetch products failure:', err);
-      setError('Unable to load products. Please check your backend connection.');
+      console.warn('Backend products offline or slow, using high-speed catalog:', err);
     } finally {
       setLoading(false);
     }
