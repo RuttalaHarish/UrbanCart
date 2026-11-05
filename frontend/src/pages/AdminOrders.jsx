@@ -37,12 +37,22 @@ function AdminOrders() {
       const response = await api.get(ORDER_ENDPOINTS.ALL);
       if (response.data && response.data.data) {
         setOrders(response.data.data);
-      } else {
-        throw new Error('Invalid response structure');
+        setLoading(false);
+        return;
       }
     } catch (err) {
-      console.error('Fetch admin orders error:', err);
-      setError('Failed to load orders');
+      console.warn('Backend admin orders offline, checking local storage:', err);
+    }
+
+    try {
+      const raw = localStorage.getItem('urbancart_local_orders');
+      if (raw) {
+        setOrders(JSON.parse(raw));
+      } else {
+        setOrders([]);
+      }
+    } catch {
+      setOrders([]);
     } finally {
       setLoading(false);
     }

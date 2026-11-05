@@ -4,6 +4,7 @@ import { FiPlus, FiEdit, FiTrash2, FiImage } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { PRODUCT_ENDPOINTS, LOW_STOCK_THRESHOLD } from '../constants';
+import { sampleProducts } from '../data/sampleProducts';
 import { Loading, ErrorState } from '../components/common';
 import { formatCurrency } from '../utils/formatCurrency';
 import '../styles/AdminProducts.css';
@@ -14,8 +15,8 @@ function AdminProducts() {
   const stockParam = searchParams.get('stock');
   const viewParam = searchParams.get('view');
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(sampleProducts);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');

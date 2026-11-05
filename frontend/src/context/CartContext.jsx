@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { CART_ENDPOINTS } from '../constants';
+import { sampleProducts } from '../data/sampleProducts';
 import { useAuth } from './AuthContext';
 
 /* ─────────────────────────────────────────
@@ -45,20 +46,28 @@ export const CartProvider = ({ children }) => {
         const rawItems = response.data.data.items || [];
         const validItems = normalizeCartItems(rawItems);
         setCartItems(validItems);
+        return;
       }
     } catch (err) {
-      // Silently fail — individual pages handle their own error UI
-      console.error('[CartContext] fetchCart error:', err);
-      setCartItems([]);
+      console.warn('[CartContext] Backend cart offline, reading local storage:', err);
     } finally {
       setLoading(false);
+    }
+
+    // Local storage fallback for live demo
+    try {
+      const stored = localStorage.getItem('urbancart_local_cart');
+      if (stored) {
+        setCartItems(JSON.parse(stored));
+      }
+    } catch {
+      setCartItems([]);
     }
   }, [isAuthenticated]);
 
   /* ─────────────────────────────────────
      addToCart
      POST /api/cart  { productId, quantity }
-     Backend returns updated cart document
   ───────────────────────────────────── */
   const addToCart = useCallback(async (productId, quantity = 1) => {
     if (!isAuthenticated) {
@@ -68,12 +77,38 @@ export const CartProvider = ({ children }) => {
       }
       return;
     }
-    const response = await api.post(CART_ENDPOINTS.ADD, { productId, quantity });
-    if (response.data?.data) {
-      const rawItems = response.data.data.items || [];
-      const validItems = normalizeCartItems(rawItems);
-      setCartItems(validItems);
+    try {
+      const response = await api.post(CART_ENDPOINTS.ADD, { productId, quantity });
+      if (response.data?.data) {
+        const rawItems = response.data.data.items || [];
+        const validItems = normalizeCartItems(rawItems);
+        setCartItems(validItems);
+        toast.success('Added to cart!');
+        return;
+      }
+    } catch (err) {
+      console.warn('Backend cart offline, updating locally:', err);
     }
+
+    // Local cart fallback
+    const match = sampleProducts.find((p) => p._id === productId);
+    setCartItems((prev) => {
+      const existing = prev.find((item) => (item.product?._id || item.product) === productId);
+      let updated;
+      if (existing) {
+        updated = prev.map((item) =>
+          (item.product?._id || item.product) === productId
+            ? { ...item, quantity: (item.quantity || 1) + quantity }
+            : item
+        );
+      } else {
+        const newProduct = match || { _id: productId, name: 'Product Item', price: 999 };
+        updated = [...prev, { _id: 'cart-item-' + Date.now(), product: newProduct, quantity }];
+      }
+      localStorage.setItem('urbancart_local_cart', JSON.stringify(updated));
+      return updated;
+    });
+    toast.success('Added to cart!');
   }, [isAuthenticated]);
 
   /* ─────────────────────────────────────
@@ -81,12 +116,23 @@ export const CartProvider = ({ children }) => {
      DELETE /api/cart/:productId
   ───────────────────────────────────── */
   const removeFromCart = useCallback(async (productId) => {
-    const response = await api.delete(CART_ENDPOINTS.REMOVE(productId));
-    if (response.data?.data) {
-      const rawItems = response.data.data.items || [];
-      const validItems = normalizeCartItems(rawItems);
-      setCartItems(validItems);
+    try {
+      const response = await api.delete(CART_ENDPOINTS.REMOVE(productId));
+      if (response.data?.data) {
+        const rawItems = response.data.data.items || [];
+        const validItems = normalizeCartItems(rawItems);
+        setCartItems(validItems);
+        return;
+      }
+    } catch (err) {
+      console.warn('Backend cart offline, removing locally:', err);
     }
+
+    setCartItems((prev) => {
+      const updated = prev.filter((item) => (item.product?._id || item.product) !== productId);
+      localStorage.setItem('urbancart_local_cart', JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   /* ─────────────────────────────────────
@@ -94,23 +140,35 @@ export const CartProvider = ({ children }) => {
      PUT /api/cart/:productId  { quantity }
   ───────────────────────────────────── */
   const updateQuantity = useCallback(async (productId, quantity) => {
-    const response = await api.put(CART_ENDPOINTS.UPDATE(productId), { quantity });
-    if (response.data?.data) {
-      const rawItems = response.data.data.items || [];
-      const validItems = normalizeCartItems(rawItems);
-      setCartItems(validItems);
+    try {
+      const response = await api.put(CART_ENDPOINTS.UPDATE(productId), { quantity });
+      if (response.data?.data) {
+        const rawItems = response.data.data.items || [];
+        const validItems = normalizeCartItems(rawItems);
+        setCartItems(validItems);
+        return;
+      }
+    } catch (err) {
+      console.warn('Backend cart offline, updating quantity locally:', err);
     }
+
+    setCartItems((prev) => {
+      const updated = prev.map((item) =>
+        (item.product?._id || item.product) === productId
+          ? { ...item, quantity }
+          : item
+      );
+      localStorage.setItem('urbancart_local_cart', JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   /* ─────────────────────────────────────
      clearCart
-     Optimistically empties local state.
-     Called after a successful order so
-     the badge resets without an extra
-     network round-trip.
   ───────────────────────────────────── */
   const clearCart = useCallback(() => {
     setCartItems([]);
+    localStorage.removeItem('urbancart_local_cart');
   }, []);
 
   /* ─────────────────────────────────────

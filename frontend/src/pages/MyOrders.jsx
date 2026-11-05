@@ -20,12 +20,22 @@ function MyOrders() {
       // GET /api/orders returns { success: true, count: X, data: [ ... ] }
       if (response.data && response.data.data) {
         setOrders(response.data.data);
-      } else {
-        throw new Error('Invalid response format');
+        setLoading(false);
+        return;
       }
     } catch (err) {
-      console.error('Fetch orders error:', err);
-      setError('Unable to retrieve your orders. Please check your connection.');
+      console.warn('Backend orders offline, checking local storage:', err);
+    }
+
+    try {
+      const stored = localStorage.getItem('urbancart_local_orders');
+      if (stored) {
+        setOrders(JSON.parse(stored));
+      } else {
+        setOrders([]);
+      }
+    } catch {
+      setOrders([]);
     } finally {
       setLoading(false);
     }

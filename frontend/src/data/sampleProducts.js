@@ -301,3 +301,4 @@ export const sampleCategories = [
   { _id: 'cat-6', name: 'Groceries', description: 'Daily organic staples, pure oils, basmati rice and premium tea.' },
   { _id: 'cat-7', name: 'Home & Kitchen', description: 'High-performance air fryers, mixer grinders, and cookers.' },
 ];
+

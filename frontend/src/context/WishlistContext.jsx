@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo } 
 import { toast } from 'react-toastify';
 import api from '../api/axios';
 import { WISHLIST_ENDPOINTS } from '../constants';
+import { sampleProducts } from '../data/sampleProducts';
 import { useAuth } from './AuthContext';
 
 /* ─────────────────────────────────────────
@@ -56,11 +57,21 @@ export const WishlistProvider = ({ children }) => {
         const rawProducts = response.data.data.products || [];
         const validProducts = normalizeWishlistItems(rawProducts);
         setWishlistItems([...validProducts]);
+        return;
       }
     } catch (err) {
-      console.error('[WishlistContext] fetch error:', err);
+      console.warn('[WishlistContext] Backend wishlist offline, reading local storage:', err);
     } finally {
       setLoading(false);
+    }
+
+    try {
+      const stored = localStorage.getItem('urbancart_local_wishlist');
+      if (stored) {
+        setWishlistItems(JSON.parse(stored));
+      }
+    } catch {
+      setWishlistItems([]);
     }
   }, [isAuthenticated, clearLocalWishlist]);
 
@@ -95,16 +106,24 @@ export const WishlistProvider = ({ children }) => {
         return response.data;
       }
     } catch (err) {
-      console.error('[WishlistContext] addToWishlist error:', err);
-      const msg = err.response?.data?.message || 'Failed to add to wishlist';
-      if (msg.toLowerCase().includes('already in wishlist')) {
-        toast.warning(msg);
-      } else {
-        toast.error(msg);
-      }
-      throw err;
+      console.warn('Backend wishlist offline, saving locally:', err);
     }
-  }, []);
+
+    // Local fallback
+    const match = sampleProducts.find((p) => p._id === productId);
+    setWishlistItems((prev) => {
+      const already = prev.some((p) => (p._id || p) === productId);
+      if (already) {
+        toast.warning('Product is already in your wishlist');
+        return prev;
+      }
+      const itemToAdd = match || { _id: productId, name: 'Wishlist Item', price: 999 };
+      const updated = [...prev, itemToAdd];
+      localStorage.setItem('urbancart_local_wishlist', JSON.stringify(updated));
+      toast.success('Added to wishlist!');
+      return updated;
+    });
+  }, [isAuthenticated]);
 
   /* ─────────────────────────────────────
      removeFromWishlist
@@ -121,11 +140,15 @@ export const WishlistProvider = ({ children }) => {
         return response.data;
       }
     } catch (err) {
-      console.error('[WishlistContext] removeFromWishlist error:', err);
-      const msg = err.response?.data?.message || 'Failed to remove from wishlist';
-      toast.error(msg);
-      throw err;
+      console.warn('Backend wishlist offline, removing locally:', err);
     }
+
+    setWishlistItems((prev) => {
+      const updated = prev.filter((p) => (p._id || p) !== productId);
+      localStorage.setItem('urbancart_local_wishlist', JSON.stringify(updated));
+      toast.success('Removed from wishlist');
+      return updated;
+    });
   }, []);
 
   /* ─────────────────────────────────────
