@@ -1,4 +1,3 @@
-import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import CartItem from '../components/cart/CartItem';
 import CartSummary from '../components/cart/CartSummary';
@@ -9,7 +8,6 @@ function Cart() {
   const {
     cartItems,
     loading,
-    fetchCart,
     updateQuantity,
     removeFromCart,
   } = useCart();

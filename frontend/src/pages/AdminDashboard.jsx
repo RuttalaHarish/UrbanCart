@@ -492,7 +492,7 @@ function AdminDashboard() {
     allOrders.forEach((o) => {
       const customerName = o.user?.name || o.shippingAddress?.fullName || 'Customer';
       const orderIdShort = o._id.substring(o._id.length - 8).toUpperCase();
-      const timestamp = new Date(o.createdAt || Date.now());
+      const timestamp = new Date(o.createdAt || 0);
 
       activities.push({
         id: `order-create-${o._id}`,
@@ -530,7 +530,7 @@ function AdminDashboard() {
     });
 
     allProducts.forEach((p) => {
-      const pTimestamp = new Date(p.createdAt || Date.now());
+      const pTimestamp = new Date(p.createdAt || 0);
 
       activities.push({
         id: `product-add-${p._id}`,

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import WishlistItem from '../components/wishlist/WishlistItem';
@@ -8,7 +7,7 @@ import EmptyWishlist from '../components/wishlist/EmptyWishlist';
 import './Wishlist.css';
 
 function Wishlist() {
-  const { wishlistItems: products, loading, removeFromWishlist, refreshWishlist } = useWishlist();
+  const { wishlistItems: products, loading, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const [movingId, setMovingId] = useState(null);
 

@@ -6,28 +6,31 @@ import { CartProvider } from '../context/CartContext';
 import { WishlistProvider } from '../context/WishlistContext';
 import ScrollToTop from '../components/common/ScrollToTop';
 import AppRoutes from './AppRoutes';
+import AuthGate from './AuthGate';
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <AppRoutes />
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop
-              closeOnClick
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="colored"
-            />
-          </WishlistProvider>
-        </CartProvider>
+        <AuthGate>
+          <CartProvider>
+            <WishlistProvider>
+              <AppRoutes />
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
+            </WishlistProvider>
+          </CartProvider>
+        </AuthGate>
       </AuthProvider>
     </BrowserRouter>
   );

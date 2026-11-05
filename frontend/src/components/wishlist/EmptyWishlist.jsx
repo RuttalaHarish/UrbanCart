@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiHeart } from 'react-icons/fi';
 import { EmptyState } from '../common';

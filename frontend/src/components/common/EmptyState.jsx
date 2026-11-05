@@ -1,4 +1,3 @@
-import React from 'react';
 import './EmptyState.css';
 
 function EmptyState({ title, message, actionText, onAction, icon: Icon }) {

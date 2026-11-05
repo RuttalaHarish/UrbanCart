@@ -8,7 +8,6 @@ import {
   FiShield,
   FiCalendar,
   FiSave,
-  FiCheckCircle,
   FiAlertCircle,
 } from 'react-icons/fi';
 import api from '../api/axios';

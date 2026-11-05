@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { FiEye, FiTrash2, FiChevronLeft, FiChevronRight, FiDownload } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import api from '../api/axios';
@@ -13,7 +13,6 @@ import '../styles/AdminOrders.css';
 const ITEMS_PER_PAGE = 10;
 
 function AdminOrders() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const statusParam = searchParams.get('status');
 

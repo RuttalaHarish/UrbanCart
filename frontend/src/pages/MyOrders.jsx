@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPackage, FiCalendar, FiArrowLeft, FiImage } from 'react-icons/fi';
+import { FiCalendar, FiArrowLeft, FiImage } from 'react-icons/fi';
 import api from '../api/axios';
 import { ORDER_ENDPOINTS } from '../constants';
 import { formatCurrency } from '../utils/formatCurrency';

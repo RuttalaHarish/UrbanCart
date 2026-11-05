@@ -22,10 +22,8 @@ function Shop() {
 
   // Local states for inputs
   const [searchInput, setSearchInput] = useState(searchParams.get('q') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [minPriceInput, setMinPriceInput] = useState(searchParams.get('minPrice') || '');
   const [maxPriceInput, setMaxPriceInput] = useState(searchParams.get('maxPrice') || '');
-  const [selectedSort, setSelectedSort] = useState(searchParams.get('sort') || 'newest');
 
   // Parse and validate URL query parameters for backend requests
   const rawPage = parseInt(searchParams.get('page'), 10);
@@ -43,10 +41,8 @@ function Shop() {
   // 1. Synchronize local input states whenever URL search parameters change (Back/Forward navigation, refresh, Clear Filters)
   useEffect(() => {
     setSearchInput(searchParams.get('q') || '');
-    setSelectedCategory(searchParams.get('category') || '');
     setMinPriceInput(searchParams.get('minPrice') || '');
     setMaxPriceInput(searchParams.get('maxPrice') || '');
-    setSelectedSort(searchParams.get('sort') || 'newest');
   }, [searchParamsString]);
 
   // 2. Debounced auto-apply effect for search, minPrice, and maxPrice text inputs (400ms delay)
@@ -161,6 +157,7 @@ function Shop() {
   };
 
   // Optional: Immediate submission if user presses Enter on search/price inputs
+  // eslint-disable-next-line no-unused-vars
   const handleInputKeyDown = (e) => {
     if (e.key === 'Enter') {
       const newParams = new URLSearchParams(searchParams);
@@ -180,9 +177,9 @@ function Shop() {
   };
 
   // Immediate Category selection update
+  // eslint-disable-next-line no-unused-vars
   const handleCategoryChange = (e) => {
     const val = e.target.value;
-    setSelectedCategory(val);
     const newParams = new URLSearchParams(searchParams);
     if (val) {
       newParams.set('category', val);
@@ -194,9 +191,9 @@ function Shop() {
   };
 
   // Immediate Sort selection update
+  // eslint-disable-next-line no-unused-vars
   const handleSortChange = (e) => {
     const val = e.target.value;
-    setSelectedSort(val);
     const newParams = new URLSearchParams(searchParams);
     if (val && val !== 'newest') {
       newParams.set('sort', val);
@@ -208,12 +205,11 @@ function Shop() {
   };
 
   // Immediate Clear Filters action
+  // eslint-disable-next-line no-unused-vars
   const handleClearFilters = () => {
     setSearchInput('');
-    setSelectedCategory('');
     setMinPriceInput('');
     setMaxPriceInput('');
-    setSelectedSort('newest');
     setSearchParams({});
   };
 

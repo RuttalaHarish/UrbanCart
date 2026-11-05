@@ -1,4 +1,3 @@
-import React from 'react';
 import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
 import './ErrorState.css';
 

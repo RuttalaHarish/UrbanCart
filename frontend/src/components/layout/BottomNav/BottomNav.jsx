@@ -8,13 +8,11 @@ import {
 } from 'react-icons/fi';
 import { useCart } from '../../../context/CartContext';
 import { useWishlist } from '../../../context/WishlistContext';
-import { useAuth } from '../../../context/AuthContext';
 import './BottomNav.css';
 
 function BottomNav() {
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
-  const { isAuthenticated, user } = useAuth();
 
   const handleNavClick = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
