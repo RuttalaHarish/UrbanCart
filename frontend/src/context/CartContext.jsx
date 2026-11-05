@@ -83,7 +83,6 @@ export const CartProvider = ({ children }) => {
         const rawItems = response.data.data.items || [];
         const validItems = normalizeCartItems(rawItems);
         setCartItems(validItems);
-        toast.success('Added to cart!');
         return;
       }
     } catch (err) {
@@ -108,7 +107,6 @@ export const CartProvider = ({ children }) => {
       localStorage.setItem('urbancart_local_cart', JSON.stringify(updated));
       return updated;
     });
-    toast.success('Added to cart!');
   }, [isAuthenticated]);
 
   /* ─────────────────────────────────────

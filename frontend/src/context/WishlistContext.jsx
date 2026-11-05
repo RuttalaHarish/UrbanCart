@@ -129,14 +129,14 @@ export const WishlistProvider = ({ children }) => {
      removeFromWishlist
      DELETE /api/wishlist/:productId
   ───────────────────────────────────── */
-  const removeFromWishlist = useCallback(async (productId) => {
+  const removeFromWishlist = useCallback(async (productId, showToast = true) => {
     try {
       const response = await api.delete(WISHLIST_ENDPOINTS.REMOVE(productId));
       if (response.data?.data) {
         const rawProducts = response.data.data.products || [];
         const validProducts = normalizeWishlistItems(rawProducts);
         setWishlistItems([...validProducts]);
-        toast.success('Removed from wishlist');
+        if (showToast) toast.success('Removed from wishlist');
         return response.data;
       }
     } catch (err) {
@@ -146,7 +146,7 @@ export const WishlistProvider = ({ children }) => {
     setWishlistItems((prev) => {
       const updated = prev.filter((p) => (p._id || p) !== productId);
       localStorage.setItem('urbancart_local_wishlist', JSON.stringify(updated));
-      toast.success('Removed from wishlist');
+      if (showToast) toast.success('Removed from wishlist');
       return updated;
     });
   }, []);

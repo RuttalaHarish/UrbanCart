@@ -25,8 +25,8 @@ function Wishlist() {
       // 1. Add item to cart
       await addToCart(productId, 1);
       
-      // 2. Remove item from wishlist (updates context state immediately)
-      await removeFromWishlist(productId);
+      // 2. Remove item from wishlist (silent without redundant toast)
+      await removeFromWishlist(productId, false);
 
       toast.success('Product moved to cart successfully!');
     } catch (err) {
